@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+tests/
+scratch/
+The_Medical_Avenue_API.postman_collection.json
+tasks.md

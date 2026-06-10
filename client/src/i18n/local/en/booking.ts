@@ -1,0 +1,58 @@
+const en_booking = {
+  "booking.hero.badge": "Book Appointment",
+  "booking.hero.heading": "Book Your Assessment Session",
+  "booking.hero.desc": "4 simple steps to book a deep assessment session with one of our specialized consultants",
+
+  "booking.progress.service": "Service",
+  "booking.progress.doctor": "Doctor",
+  "booking.progress.datetime": "Date & Time",
+  "booking.progress.info": "Your Info",
+
+  "booking.step1.heading": "Choose a Service",
+  "booking.step1.desc": "Start by selecting the service you need",
+  "booking.step1.filter_all": "All",
+  "booking.step1.selected": "Selected Service",
+  "booking.step1.continue": "Continue — Choose Doctor",
+
+  "booking.step2.heading": "Choose a Doctor",
+  "booking.step2.desc": "Select the consultant best suited for your case",
+  "booking.step2.search": "Search by name or specialty...",
+  "booking.step2.visit_type": "Visit Type",
+  "booking.step2.first_visit": "First Visit",
+  "booking.step2.followup": "Follow-up",
+  "booking.step2.consultation": "Consultation",
+  "booking.step2.specialist_first": "Specialists in Your Service",
+  "booking.step2.other_doctors": "Other Consultants",
+  "booking.step2.continue": "Continue — Choose Date & Time",
+
+  "booking.step3.heading": "Choose Date & Time",
+  "booking.step3.desc": "Select a convenient date and time",
+  "booking.step3.morning": "Morning",
+  "booking.step3.afternoon": "Afternoon",
+  "booking.step3.evening": "Evening",
+  "booking.step3.booked": "Booked",
+  "booking.step3.selected_slot": "Selected Slot",
+  "booking.step3.continue": "Continue — Your Info",
+
+  "booking.step4.heading": "Your Personal Information",
+  "booking.step4.summary": "Booking Summary",
+  "booking.step4.name": "Full Name",
+  "booking.step4.phone": "Phone Number",
+  "booking.step4.email": "Email Address",
+  "booking.step4.age": "Age",
+  "booking.step4.gender": "Gender",
+  "booking.step4.male": "Male",
+  "booking.step4.female": "Female",
+  "booking.step4.notes": "Additional Notes",
+  "booking.step4.notes_placeholder": "Any additional information you'd like to share with the doctor...",
+  "booking.step4.confirm": "Confirm Booking",
+  "booking.step4.terms": "By continuing, I agree to the Privacy Policy and Terms of Use",
+
+  "booking.confirmation.heading": "Your Booking is Confirmed!",
+  "booking.confirmation.desc": "Our team will contact you within an hour to confirm the details",
+  "booking.confirmation.ref": "Booking Reference",
+  "booking.confirmation.home": "Back to Home",
+  "booking.confirmation.another": "Book Another Appointment",
+};
+
+export default en_booking;

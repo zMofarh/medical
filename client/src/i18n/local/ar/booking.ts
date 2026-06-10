@@ -1,0 +1,58 @@
+const ar_booking = {
+  "booking.hero.badge": "حجز موعد",
+  "booking.hero.heading": "احجز جلسة تقييمك",
+  "booking.hero.desc": "4 خطوات بسيطة لحجز جلسة تقييم عميق مع أحد استشاريينا المتخصصين",
+
+  "booking.progress.service": "الخدمة",
+  "booking.progress.doctor": "الطبيب",
+  "booking.progress.datetime": "الموعد",
+  "booking.progress.info": "بياناتك",
+
+  "booking.step1.heading": "اختر الخدمة",
+  "booking.step1.desc": "ابدأ باختيار الخدمة التي تحتاجها",
+  "booking.step1.filter_all": "الكل",
+  "booking.step1.selected": "الخدمة المختارة",
+  "booking.step1.continue": "متابعة — اختيار الطبيب",
+
+  "booking.step2.heading": "اختر الطبيب",
+  "booking.step2.desc": "اختر الاستشاري المناسب لحالتك",
+  "booking.step2.search": "ابحث بالاسم أو التخصص...",
+  "booking.step2.visit_type": "نوع الزيارة",
+  "booking.step2.first_visit": "زيارة أولى",
+  "booking.step2.followup": "متابعة",
+  "booking.step2.consultation": "استشارة",
+  "booking.step2.specialist_first": "متخصصون في خدمتك",
+  "booking.step2.other_doctors": "استشاريون آخرون",
+  "booking.step2.continue": "متابعة — اختيار الموعد",
+
+  "booking.step3.heading": "اختر الموعد",
+  "booking.step3.desc": "اختر التاريخ والوقت المناسبين",
+  "booking.step3.morning": "الصباح",
+  "booking.step3.afternoon": "الظهيرة",
+  "booking.step3.evening": "المساء",
+  "booking.step3.booked": "محجوز",
+  "booking.step3.selected_slot": "الموعد المختار",
+  "booking.step3.continue": "متابعة — بياناتك",
+
+  "booking.step4.heading": "بياناتك الشخصية",
+  "booking.step4.summary": "ملخص الحجز",
+  "booking.step4.name": "الاسم الكامل",
+  "booking.step4.phone": "رقم الجوال",
+  "booking.step4.email": "البريد الإلكتروني",
+  "booking.step4.age": "العمر",
+  "booking.step4.gender": "الجنس",
+  "booking.step4.male": "ذكر",
+  "booking.step4.female": "أنثى",
+  "booking.step4.notes": "ملاحظات إضافية",
+  "booking.step4.notes_placeholder": "أي معلومات إضافية تود مشاركتها مع الطبيب...",
+  "booking.step4.confirm": "تأكيد الحجز",
+  "booking.step4.terms": "بالمتابعة أوافق على سياسة الخصوصية وشروط الاستخدام",
+
+  "booking.confirmation.heading": "تم تأكيد حجزك!",
+  "booking.confirmation.desc": "سيتواصل معك فريقنا خلال ساعة لتأكيد التفاصيل",
+  "booking.confirmation.ref": "رقم الحجز",
+  "booking.confirmation.home": "العودة للرئيسية",
+  "booking.confirmation.another": "حجز موعد آخر",
+};
+
+export default ar_booking;
