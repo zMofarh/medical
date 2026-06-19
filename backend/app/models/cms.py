@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, Integer, Numeric, DateTime, func
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Uuid as UUID, JSON as JSONB
 from app.core.database import Base
 
 class CMSHome(Base):

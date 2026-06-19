@@ -4,6 +4,8 @@ from app.models.blog import BlogCategory, BlogPost
 from app.models.booking import Booking
 from app.models.contact import ContactMessage
 
+from app.models.faq import FAQCategory, FAQItem
+
 # تصدير كافة النماذج كحزمة واحدة لتسهيل الاستيراد وتهيئة هجرات Alembic
 __all__ = [
     "User",
@@ -15,4 +17,6 @@ __all__ = [
     "BlogPost",
     "Booking",
     "ContactMessage",
+    "FAQCategory",
+    "FAQItem",
 ]

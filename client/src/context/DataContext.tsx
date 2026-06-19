@@ -6,6 +6,7 @@ import { getServices } from "@/api/services";
 import { getPackages } from "@/api/packages";
 import { BlogPost, BlogCategory, getPosts, getCategories, adaptPost } from "@/api/blog";
 import { getHomeContent, updateHomeContent } from "@/api/cms_home";
+import { getFaqs, getFaqCategories, massSaveFaqs } from "@/api/faq";
 
 // Mocks imports
 import { PackageCategory } from "@/mocks/packagesData";
@@ -132,6 +133,9 @@ interface DataContextType {
   // FAQs
   faqs: FAQItem[];
   faqCategories: FAQCategory[];
+  faqsLoading: boolean;
+  faqsError: string | null;
+  reloadFAQs: () => Promise<void>;
   saveFAQs: (newFaqs: FAQItem[], newCats: FAQCategory[]) => Promise<void>;
   resetFAQs: () => void;
 
@@ -254,8 +258,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ─── LocalStorage State ──────────────────────────────────────────────────────
   // FAQs
-  const [faqs, setFaqs] = useState<FAQItem[]>(() => readLS("cms_faq_items", initialFaqs));
-  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>(() => readLS("cms_faq_categories", initialCategories));
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>([]);
+  const [faqsLoading, setFaqsLoading] = useState(true);
+  const [faqsError, setFaqsError] = useState<string | null>(null);
 
   // About
   const [aboutHeroState, setAboutHero] = useState(() => readLS("about_hero", aboutHero));
@@ -448,6 +454,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const reloadFAQs = useCallback(async () => {
+    setFaqsLoading(true);
+    setFaqsError(null);
+    try {
+      const [fetchedFaqs, fetchedCategories] = await Promise.all([
+        getFaqs(),
+        getFaqCategories()
+      ]);
+      setFaqs(fetchedFaqs);
+      setFaqCategories(fetchedCategories);
+    } catch (err) {
+      setFaqsError(err instanceof Error ? err.message : "فشل في تحميل الأسئلة الشائعة");
+      // Fallback
+      setFaqs(readLS("cms_faq_items", initialFaqs));
+      setFaqCategories(readLS("cms_faq_categories", initialCategories));
+    } finally {
+      setFaqsLoading(false);
+    }
+  }, []);
+
   // Load all API entities on mount
   useEffect(() => {
     reloadDoctors();
@@ -455,7 +481,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     reloadPackages();
     reloadBlog();
     reloadHomeContent();
-  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent]);
+    reloadFAQs();
+  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, reloadFAQs]);
 
   // Listen to cross-component updates via CustomEvents
   useEffect(() => {
@@ -469,6 +496,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (key === "services") reloadServices();
       if (key === "packages") reloadPackages();
       if (key === "blog") reloadBlog();
+      if (key === "faqs") reloadFAQs();
 
       // local storage syncing
       if (key === "cms_faq_items") setFaqs(readLS("cms_faq_items", initialFaqs));
@@ -509,18 +537,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     window.addEventListener("cms-update", handler);
     return () => window.removeEventListener("cms-update", handler);
-  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent]);
+  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, reloadFAQs]);
 
   // ─── LocalStorage Savers & Resetters ──────────────────────────────────────────
 
   // FAQs
   const saveFAQs = async (newFaqs: FAQItem[], newCats: FAQCategory[]) => {
-    writeLS("cms_faq_items", newFaqs);
-    writeLS("cms_faq_categories", newCats);
-    setFaqs(newFaqs);
-    setFaqCategories(newCats);
-    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_items" } }));
-    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_categories" } }));
+    try {
+      await massSaveFaqs(newFaqs, faqs, newCats, faqCategories);
+      await reloadFAQs();
+      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "faqs" } }));
+    } catch (err) {
+      console.error("Failed to mass save FAQs:", err);
+      writeLS("cms_faq_items", newFaqs);
+      writeLS("cms_faq_categories", newCats);
+      setFaqs(newFaqs);
+      setFaqCategories(newCats);
+      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_items" } }));
+      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_categories" } }));
+      throw err;
+    }
   };
 
   const resetFAQs = () => {
@@ -771,6 +807,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         faqs,
         faqCategories,
+        faqsLoading,
+        faqsError,
+        reloadFAQs,
         saveFAQs,
         resetFAQs,
 

@@ -30,7 +30,7 @@ export default function CustomCursor() {
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
       posRef.current = { x: e.clientX, y: e.clientY };
-      if (!isVisible) setIsVisible(true);
+      setIsVisible((prev) => (prev ? prev : true));
     };
 
     const handleEnter = () => setIsVisible(true);
@@ -42,28 +42,30 @@ export default function CustomCursor() {
     // Detect hoverable elements
     const handleElementEnter = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      let newState: CursorState = "default";
+      
       if (
         target.tagName === "A" ||
         target.tagName === "BUTTON" ||
-        target.closest("a") ||
-        target.closest("button") ||
-        target.getAttribute("role") === "button" ||
-        target.classList.contains("cursor-pointer")
+        target.closest?.("a") ||
+        target.closest?.("button") ||
+        target.getAttribute?.("role") === "button" ||
+        target.classList?.contains("cursor-pointer")
       ) {
-        setCursorState("hover");
+        newState = "hover";
       } else if (
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.tagName === "SELECT"
       ) {
-        setCursorState("text");
-      } else {
-        setCursorState("default");
+        newState = "text";
       }
+      
+      setCursorState((prev) => (prev !== newState ? newState : prev));
     };
 
     window.addEventListener("mousemove", handleMove, { passive: true });
-    window.addEventListener("mousemove", handleElementEnter, { passive: true });
+    window.addEventListener("mouseover", handleElementEnter, { passive: true });
     window.addEventListener("mouseenter", handleEnter);
     window.addEventListener("mouseleave", handleLeave);
     window.addEventListener("mousedown", handleMouseDown);
@@ -73,14 +75,14 @@ export default function CustomCursor() {
 
     return () => {
       window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mousemove", handleElementEnter);
+      window.removeEventListener("mouseover", handleElementEnter);
       window.removeEventListener("mouseenter", handleEnter);
       window.removeEventListener("mouseleave", handleLeave);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [animate, isVisible]);
+  }, [animate]);
 
   // Hide on touch devices
   const [isTouchDevice, setIsTouchDevice] = useState(false);

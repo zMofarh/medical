@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
 
 # revision identifiers, used by Alembic.
 revision: str = 'ab4e89b006ad'
@@ -61,13 +61,13 @@ def upgrade() -> None:
     sa.Column('reviews_count', sa.Integer(), nullable=True),
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('education', sa.String(), nullable=True),
-    sa.Column('languages', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('available_days', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('languages', sa.JSON(), nullable=True),
+    sa.Column('available_days', sa.JSON(), nullable=True),
     sa.Column('bio', sa.String(), nullable=True),
-    sa.Column('specializations', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('achievements', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('specializations', sa.JSON(), nullable=True),
+    sa.Column('achievements', sa.JSON(), nullable=True),
     sa.Column('consultation_fee', sa.String(), nullable=True),
-    sa.Column('reviews', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('reviews', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -75,11 +75,11 @@ def upgrade() -> None:
     op.create_index(op.f('ix_cms_doctors_doctor_id'), 'cms_doctors', ['doctor_id'], unique=True)
     op.create_table('cms_home',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('hero', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('why_us', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('cta', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('trust_bar', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('testimonials', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+    sa.Column('hero', sa.JSON(), nullable=False),
+    sa.Column('why_us', sa.JSON(), nullable=False),
+    sa.Column('cta', sa.JSON(), nullable=False),
+    sa.Column('trust_bar', sa.JSON(), nullable=False),
+    sa.Column('testimonials', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -93,14 +93,14 @@ def upgrade() -> None:
     sa.Column('original_price', sa.Integer(), nullable=True),
     sa.Column('badge', sa.String(), nullable=True),
     sa.Column('icon', sa.String(), nullable=True),
-    sa.Column('features', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('features', sa.JSON(), nullable=True),
     sa.Column('accent_color', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('duration', sa.String(), nullable=True),
     sa.Column('target_audience', sa.String(), nullable=True),
-    sa.Column('preparation', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('includes', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('faqs', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('preparation', sa.JSON(), nullable=True),
+    sa.Column('includes', sa.JSON(), nullable=True),
+    sa.Column('faqs', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -118,12 +118,12 @@ def upgrade() -> None:
     sa.Column('image', sa.String(), nullable=True),
     sa.Column('hero_image', sa.String(), nullable=True),
     sa.Column('category', sa.String(), nullable=True),
-    sa.Column('stats', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('procedures', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('prices', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('doctors', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('faqs', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('related_services', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('stats', sa.JSON(), nullable=True),
+    sa.Column('procedures', sa.JSON(), nullable=True),
+    sa.Column('prices', sa.JSON(), nullable=True),
+    sa.Column('doctors', sa.JSON(), nullable=True),
+    sa.Column('faqs', sa.JSON(), nullable=True),
+    sa.Column('related_services', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -168,7 +168,7 @@ def upgrade() -> None:
     sa.Column('date', sa.String(), nullable=True),
     sa.Column('read_time', sa.String(), nullable=True),
     sa.Column('image', sa.String(), nullable=True),
-    sa.Column('tags', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('tags', sa.JSON(), nullable=True),
     sa.Column('featured', sa.Boolean(), nullable=True),
     sa.Column('views', sa.Integer(), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=True),

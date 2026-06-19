@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 function useCountdown(targetDate: Date) {
@@ -37,8 +37,11 @@ export function OffersTopStrip() {
     if (!dismissed) setVisible(true);
   }, []);
 
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 3);
+  const endDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 3);
+    return d;
+  }, []);
   const { hours, minutes, seconds } = useCountdown(endDate);
 
   const dismiss = () => {
@@ -108,8 +111,11 @@ export function OffersPopupBanner() {
     }
   }, []);
 
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 3);
+  const endDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 3);
+    return d;
+  }, []);
   const { hours, minutes, seconds } = useCountdown(endDate);
 
   const dismiss = () => {

@@ -7,17 +7,10 @@
 }
 
 html {
-  scroll-behavior: smooth;
 }
 
-/* ─── Hide default cursor on desktop (site only, not admin) ─── */
-@media (pointer: fine) {
-  body:not(.admin-page) *, 
-  body:not(.admin-page) *::before, 
-  body:not(.admin-page) *::after {
-    cursor: none !important;
-  }
-}
+/* ─── Hide default cursor on desktop (site only, not admin) ─── 
+   (Removed to restore default cursor as requested) */
 
 /* ─── Restore normal cursor for admin pages ─── */
 .admin-page *, 

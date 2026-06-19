@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, DateTime, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Uuid as UUID
 from app.core.database import Base
 
 class ContactMessage(Base):

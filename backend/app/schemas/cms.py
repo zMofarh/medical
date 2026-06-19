@@ -131,14 +131,14 @@ class CMSPackageBase(BaseModel):
     original_price: Optional[int] = None
     badge: Optional[str] = None
     icon: Optional[str] = None
-    features: List[Dict[str, Any]] = Field(default_factory=list)
+    features: List[Any] = Field(default_factory=list)
     accent_color: str = "teal"
     description: Optional[str] = None
     duration: Optional[str] = None
     target_audience: Optional[str] = None
-    preparation: List[str] = Field(default_factory=list)
-    includes: List[str] = Field(default_factory=list)
-    faqs: List[Dict[str, Any]] = Field(default_factory=list)
+    preparation: List[Any] = Field(default_factory=list)
+    includes: List[Any] = Field(default_factory=list)
+    faqs: List[Any] = Field(default_factory=list)
 
 class CMSPackageCreate(CMSPackageBase):
     pass
@@ -150,14 +150,14 @@ class CMSPackageUpdate(BaseModel):
     original_price: Optional[int] = None
     badge: Optional[str] = None
     icon: Optional[str] = None
-    features: Optional[List[Dict[str, Any]]] = None
+    features: Optional[List[Any]] = None
     accent_color: Optional[str] = None
     description: Optional[str] = None
     duration: Optional[str] = None
     target_audience: Optional[str] = None
-    preparation: Optional[List[str]] = None
-    includes: Optional[List[str]] = None
-    faqs: Optional[List[Dict[str, Any]]] = None
+    preparation: Optional[List[Any]] = None
+    includes: Optional[List[Any]] = None
+    faqs: Optional[List[Any]] = None
 
 class CMSPackageResponse(CMSPackageBase):
     id: UUID

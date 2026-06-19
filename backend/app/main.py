@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routers import auth, contact, bookings, cms_home, services, doctors, packages, blog
+from app.api.routers import auth, contact, bookings, cms_home, services, doctors, packages, blog, faq
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -24,8 +24,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# تسجيل المسارات
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(contact.router, prefix="/api/contact", tags=["Public Forms & Admin"])
 app.include_router(bookings.router, prefix="/api/bookings", tags=["Public Forms & Admin"])
@@ -34,6 +32,8 @@ app.include_router(services.router, prefix="/api/services", tags=["CMS Services"
 app.include_router(doctors.router, prefix="/api/doctors", tags=["CMS Doctors"])
 app.include_router(packages.router, prefix="/api/packages", tags=["CMS Packages"])
 app.include_router(blog.router, prefix="/api/blog", tags=["Blog & Articles"])
+app.include_router(faq.router, prefix="/api", tags=["FAQ"])
+
 
 @app.get("/api/health")
 def health_check():

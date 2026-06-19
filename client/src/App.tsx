@@ -17,9 +17,7 @@ function GlobalEffects() {
 
   return (
     <>
-      <CustomCursor />
       <ScrollProgress />
-      <MouseFollower />
       <WhatsAppButton />
     </>
   );

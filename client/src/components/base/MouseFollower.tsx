@@ -29,8 +29,7 @@ export default function MouseFollower({
       currentRef.current.y += (posRef.current.y - currentRef.current.y) * 0.08;
 
       if (el) {
-        el.style.left = `${currentRef.current.x - size / 2}px`;
-        el.style.top = `${currentRef.current.y - size / 2}px`;
+        el.style.transform = `translate3d(${currentRef.current.x - size / 2}px, ${currentRef.current.y - size / 2}px, 0)`;
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -54,7 +53,9 @@ export default function MouseFollower({
         height: size,
         borderRadius: "50%",
         background: `radial-gradient(circle, rgba(${color},${opacity}) 0%, transparent 70%)`,
-        willChange: "left, top",
+        willChange: "transform",
+        top: 0,
+        left: 0,
         transition: "none",
       }}
     />
