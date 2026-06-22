@@ -1,8 +1,8 @@
+import { useDataContext, type MedicalPackage } from "@/context/DataContext";
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/feature/Navbar";
 import Footer from "@/components/feature/Footer";
-import { allPackages, type MedicalPackage } from "@/mocks/packagesData";
 import { usePublicOffers } from "@/hooks/useCMSOffers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -162,6 +162,7 @@ function OfferPackageCard({ pkg, discountPercent }: { pkg: MedicalPackage; disco
 // ─── Flash Deal Card ──────────────────────────────────────────────────────────
 
 function FlashDealCard({ deal }: { deal: FlashDeal }) {
+  const { packages: allPackages } = useDataContext();
   const endDate = useMemo(() => {
     const d = new Date();
     d.setHours(d.getHours() + deal.endsIn);
@@ -223,6 +224,7 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
 // ─── Seasonal Offer Section ───────────────────────────────────────────────────
 
 function SeasonalOfferSection({ offer }: { offer: SeasonalOffer }) {
+  const { packages: allPackages } = useDataContext();
   const packages = offer.packageIds
     .map((id) => allPackages.find((p) => p.id === id))
     .filter(Boolean) as MedicalPackage[];
@@ -267,6 +269,8 @@ function SeasonalOfferSection({ offer }: { offer: SeasonalOffer }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function OffersPage() {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const { hero, seasonal, flash, redeem, notify } = usePublicOffers();
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
@@ -290,7 +294,7 @@ export default function OffersPage() {
 
   // Convert CMS flash deals to display format
   const flashDeals: FlashDeal[] = flash.map((f) => ({
-    packageId: f.packageId,
+    packageId: f.packageIds?.[0] || f.packageId || "",
     flashDiscount: f.flashDiscount,
     endsIn: f.endsIn,
     label: f.label,
@@ -490,18 +494,18 @@ export default function OffersPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
             <Link
-              to="/booking"
+              to={notify.ctaPrimary?.link || "/booking"}
               className="flex-1 bg-white text-brand-forest-700 font-bold px-6 py-3 rounded-full hover:bg-brand-cream-50 transition-colors whitespace-nowrap cursor-pointer text-sm text-center"
             >
               <i className="ri-calendar-check-line ml-2"></i>
-              {notify.ctaPrimary}
+              {notify.ctaPrimary?.text || "احجز الآن"}
             </Link>
             <Link
-              to="/contact"
+              to={notify.ctaSecondary?.link || "/contact"}
               className="flex-1 border-2 border-white/50 text-white font-bold px-6 py-3 rounded-full hover:bg-white/10 transition-colors whitespace-nowrap cursor-pointer text-sm text-center"
             >
               <i className="ri-phone-line ml-2"></i>
-              {notify.ctaSecondary}
+              {notify.ctaSecondary?.text || "تواصل معنا"}
             </Link>
           </div>
         </div>

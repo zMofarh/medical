@@ -1,17 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  offersHeroData,
-  seasonalOffersData,
-  flashDealsData,
-  howToRedeemSteps,
-  offersNotifyData,
-  type OffersHeroCMS,
-  type SeasonalOfferCMS,
-  type FlashDealCMS,
-  type HowToRedeemStep,
-  type OffersNotifyCMS,
-} from "@/mocks/offersData";
 import { useDataContext } from "@/context/DataContext";
+import { FlashDeal, HowToRedeemStep, OffersHeroData, OffersNotifyData, SeasonalOffer } from "@/types/cms";
+
+export type OffersHeroCMS = OffersHeroData;
+export type SeasonalOfferCMS = SeasonalOffer;
+export type FlashDealCMS = FlashDeal;
+export type OffersNotifyCMS = OffersNotifyData;
 
 // ─── CMS Admin hook (for CMS admin pages) ────────────────────────────────────
 export function useCMSOffers() {
@@ -22,14 +16,13 @@ export function useCMSOffers() {
     offersRedeem: globalRedeem,
     offersNotify: globalNotify,
     saveOffers,
-    resetOffers,
   } = useDataContext();
 
-  const [hero, setHero]         = useState<OffersHeroCMS>(globalHero);
-  const [seasonal, setSeasonal] = useState<SeasonalOfferCMS[]>(globalSeasonal);
-  const [flash, setFlash]       = useState<FlashDealCMS[]>(globalFlash);
+  const [hero, setHero]         = useState<OffersHeroData>(globalHero);
+  const [seasonal, setSeasonal] = useState<SeasonalOffer[]>(globalSeasonal);
+  const [flash, setFlash]       = useState<FlashDeal[]>(globalFlash);
   const [redeem, setRedeem]     = useState<HowToRedeemStep[]>(globalRedeem);
-  const [notify, setNotify]     = useState<OffersNotifyCMS>(globalNotify);
+  const [notify, setNotify]     = useState<OffersNotifyData>(globalNotify);
   
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [hasChanges, setHasChanges] = useState(false);
@@ -43,11 +36,11 @@ export function useCMSOffers() {
   }, [globalHero, globalSeasonal, globalFlash, globalRedeem, globalNotify]);
 
   const save = useCallback(async (data: {
-    hero: OffersHeroCMS;
-    seasonal: SeasonalOfferCMS[];
-    flash: FlashDealCMS[];
+    hero: OffersHeroData;
+    seasonal: SeasonalOffer[];
+    flash: FlashDeal[];
     redeem: HowToRedeemStep[];
-    notify: OffersNotifyCMS;
+    notify: OffersNotifyData;
   }) => {
     setSaveStatus("saving");
     try {
@@ -62,16 +55,20 @@ export function useCMSOffers() {
     }
   }, [saveOffers]);
 
-  const updateHero = useCallback((d: OffersHeroCMS) => { setHero(d); setHasChanges(true); }, []);
-  const updateSeasonal = useCallback((d: SeasonalOfferCMS[]) => { setSeasonal(d); setHasChanges(true); }, []);
-  const updateFlash = useCallback((d: FlashDealCMS[]) => { setFlash(d); setHasChanges(true); }, []);
+  const updateHero = useCallback((d: OffersHeroData) => { setHero(d); setHasChanges(true); }, []);
+  const updateSeasonal = useCallback((d: SeasonalOffer[]) => { setSeasonal(d); setHasChanges(true); }, []);
+  const updateFlash = useCallback((d: FlashDeal[]) => { setFlash(d); setHasChanges(true); }, []);
   const updateRedeem = useCallback((d: HowToRedeemStep[]) => { setRedeem(d); setHasChanges(true); }, []);
-  const updateNotify = useCallback((d: OffersNotifyCMS) => { setNotify(d); setHasChanges(true); }, []);
+  const updateNotify = useCallback((d: OffersNotifyData) => { setNotify(d); setHasChanges(true); }, []);
 
   const reset = useCallback(() => {
-    resetOffers();
+    setHero(globalHero);
+    setSeasonal(globalSeasonal);
+    setFlash(globalFlash);
+    setRedeem(globalRedeem);
+    setNotify(globalNotify);
     setHasChanges(false);
-  }, [resetOffers]);
+  }, [globalHero, globalSeasonal, globalFlash, globalRedeem, globalNotify]);
 
   return {
     hero, seasonal, flash, redeem, notify,
@@ -99,4 +96,4 @@ export function usePublicOffers() {
     notify,
   };
 }
-export type { OffersHeroCMS, SeasonalOfferCMS, FlashDealCMS, HowToRedeemStep, OffersNotifyCMS };
+export type { HowToRedeemStep };

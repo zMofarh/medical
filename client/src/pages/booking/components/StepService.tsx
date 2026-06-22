@@ -1,5 +1,5 @@
+import { useDataContext } from "@/context/DataContext";
 import { useState } from "react";
-import { servicesData } from "@/mocks/servicesData";
 import PackageSummaryBanner from "@/pages/booking/components/PackageSummaryBanner";
 
 const accentMap: Record<string, { bg: string; text: string; border: string; activeBg: string; activeBorder: string }> = {
@@ -12,8 +12,6 @@ const accentMap: Record<string, { bg: string; text: string; border: string; acti
   green:  { bg: "bg-green-50",   text: "text-green-600",   border: "border-green-100",   activeBg: "bg-green-100",   activeBorder: "border-green-400" },
 };
 
-const categories = ["الكل", ...Array.from(new Set(servicesData.map((s) => s.category)))];
-
 interface StepServiceProps {
   selected: string;
   onSelect: (id: string) => void;
@@ -22,7 +20,11 @@ interface StepServiceProps {
 }
 
 export default function StepService({ selected, onSelect, onNext, packageId }: StepServiceProps) {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
+  const categories = ["الكل", ...Array.from(new Set(servicesData.map((s) => s.category)))];
   const [activeCategory, setActiveCategory] = useState("الكل");
+
 
   const filtered = servicesData.filter(
     (s) => activeCategory === "الكل" || s.category === activeCategory

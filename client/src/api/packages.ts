@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'http://localhost:8000/api/packages';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/packages`;
 
 export interface CMSPackageCreate {
   package_id: string;
@@ -14,7 +15,7 @@ export interface CMSPackageCreate {
   duration?: string;
   target_audience?: string;
   preparation?: string[];
-  includes?: string[];
+  includes?: { label: string; icon: string }[];
   faqs?: any[];
 }
 
@@ -29,20 +30,20 @@ export interface CMSPackageResponse extends CMSPackageCreate {
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 export async function getPackages(skip = 0, limit = 100): Promise<CMSPackageResponse[]> {
-  const res = await fetch(`${API_BASE_URL}/?skip=${skip}&limit=${limit}`);
+  const res = await fetch(`${LOCAL_API_URL}/?skip=${skip}&limit=${limit}`);
   if (!res.ok) throw new Error("Failed to fetch packages");
   return res.json();
 }
 
 export async function getPackageById(id: string): Promise<CMSPackageResponse> {
-  const res = await fetch(`${API_BASE_URL}/${id}`);
+  const res = await fetch(`${LOCAL_API_URL}/${id}`);
   if (!res.ok) throw new Error("Failed to fetch package details");
   return res.json();
 }
 
 export async function createPackage(data: CMSPackageCreate): Promise<CMSPackageResponse> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +67,7 @@ export async function createPackage(data: CMSPackageCreate): Promise<CMSPackageR
 
 export async function updatePackage(id: string, data: CMSPackageUpdate): Promise<CMSPackageResponse> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -90,7 +91,7 @@ export async function updatePackage(id: string, data: CMSPackageUpdate): Promise
 
 export async function deletePackage(id: string): Promise<{ message: string }> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`
@@ -109,3 +110,4 @@ export async function deletePackage(id: string): Promise<{ message: string }> {
 
   return res.json();
 }
+

@@ -1,6 +1,6 @@
+import { useDataContext } from "@/context/DataContext";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { allPackages } from "@/mocks/packagesData";
 
 const accentMap: Record<string, {
   bg: string; text: string; border: string; iconBg: string;
@@ -21,6 +21,8 @@ interface PackageSummaryBannerProps {
 }
 
 export default function PackageSummaryBanner({ packageId }: PackageSummaryBannerProps) {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const [expanded, setExpanded] = useState(false);
   const pkg = allPackages.find((p) => p.id === packageId);
   if (!pkg) return null;

@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:8000/api/blog';
+import { API_BASE_URL } from './config';
+const BLOG_API_URL = `${API_BASE_URL}/blog`;
 
 // --- Backend Interfaces ---
 export interface BackendCategory {
@@ -109,25 +110,25 @@ export const toBackendPost = (post: Partial<BlogPost>) => ({
 // --- API Calls ---
 
 export async function getCategories(): Promise<BlogCategory[]> {
-  const res = await fetch(`${API_BASE_URL}/categories`);
-  if (!res.ok) throw new Error("Failed to fetch categories");
-  const data: BackendCategory[] = await res.json();
+  const response = await fetch(`${BLOG_API_URL}/categories`);
+  if (!response.ok) throw new Error("Failed to fetch categories");
+  const data: BackendCategory[] = await response.json();
   return data.map(adaptCategory);
 }
 
 export async function createCategory(cat: BlogCategory, token: string): Promise<BlogCategory> {
-  const res = await fetch(`${API_BASE_URL}/categories`, {
+  const response = await fetch(`${BLOG_API_URL}/categories`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     body: JSON.stringify({ category_id: cat.id, label: cat.label }),
   });
-  if (!res.ok) throw new Error("Failed to create category");
-  const data: BackendCategory = await res.json();
+  if (!response.ok) throw new Error("Failed to create category");
+  const data: BackendCategory = await response.json();
   return adaptCategory(data);
 }
 
 export async function deleteCategory(categoryId: string, token: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/categories/${categoryId}`, {
+  const res = await fetch(`${BLOG_API_URL}/categories/${categoryId}`, {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${token}` },
   });
@@ -143,28 +144,28 @@ export async function getPosts(status?: string, categoryId?: string, search?: st
   if (categoryId && categoryId !== "all") params.append("category", categoryId);
   if (search) params.append("search", search);
 
-  const res = await fetch(`${API_BASE_URL}/posts?${params.toString()}`);
+  const res = await fetch(`${BLOG_API_URL}/posts?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();
 }
 
 export async function getPost(postId: string): Promise<BackendPost> {
-  const res = await fetch(`${API_BASE_URL}/posts/${postId}`);
+  const res = await fetch(`${BLOG_API_URL}/posts/${postId}`);
   if (!res.ok) throw new Error("Failed to fetch post");
   return res.json();
 }
 
 export async function createPost(post: Partial<BlogPost>, token: string): Promise<BackendPost> {
-  const res = await fetch(`${API_BASE_URL}/posts`, {
+  const response = await fetch(`${BLOG_API_URL}/posts`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     body: JSON.stringify(toBackendPost(post)),
   });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
     throw new Error(errorData?.detail || "Failed to create post");
   }
-  return res.json();
+  return response.json();
 }
 
 export async function updatePost(postId: string, post: Partial<BlogPost>, token: string): Promise<BackendPost> {

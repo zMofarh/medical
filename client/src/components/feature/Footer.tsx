@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { clinicInfo } from "@/mocks/clinicData";
 import { usePublicSettings } from "@/hooks/useCMSSettings";
 import { StarShape, SunShape, SwanShape, LotusShape } from "@/components/base/BrandShapes";
+import { ClinicInfo } from "@/types/cms";
 
 const precisionBadges = [
   { icon: "ri-dna-line",    label: "DNA Risk Score" },
@@ -13,7 +13,7 @@ const precisionBadges = [
 export default function Footer() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith("ar") || !i18n.language?.startsWith("en");
-  const { social } = usePublicSettings();
+  const { info: clinicInfo, hours, social } = usePublicSettings();
 
   const socialPlatforms = [
     { id: "instagram", icon: "ri-instagram-line",  label: "Instagram" },
@@ -186,7 +186,7 @@ export default function Footer() {
                 <div className="w-8 h-8 flex items-center justify-center bg-brand-cream-300/10 rounded-lg flex-shrink-0">
                   <i className="ri-time-line text-brand-cream-300 text-sm"></i>
                 </div>
-                <span className="text-sm text-brand-cream-200/55">{clinicInfo.workingHours}</span>
+                <span className="text-sm text-brand-cream-200/55">{hours?.regular || clinicInfo.workingHours}</span>
               </li>
             </ul>
 

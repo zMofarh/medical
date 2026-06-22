@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { aboutValues } from "@/mocks/aboutData";
+import { AboutValue } from "@/types/cms";
 
-type ValuesData = typeof aboutValues;
+type ValuesData = AboutValue[];
 type ValueItem = ValuesData[number];
 
 interface Props {

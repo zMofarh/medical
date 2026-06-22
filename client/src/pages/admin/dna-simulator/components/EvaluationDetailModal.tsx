@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import type { DNAEvaluation } from "@/mocks/dnaSimulatorData";
 
 interface EvaluationDetailModalProps {
   evaluation: DNAEvaluation | null;
   onClose: () => void;
   onStatusChange: (id: string, status: string) => void;
+  onSaveNotes: (notes: string) => void;
 }
 
 const statusOptions = [
@@ -24,7 +26,13 @@ export default function EvaluationDetailModal({
   evaluation,
   onClose,
   onStatusChange,
+  onSaveNotes,
 }: EvaluationDetailModalProps) {
+  const [notesText, setNotesText] = useState(evaluation?.notes || "");
+
+  useEffect(() => {
+    setNotesText(evaluation?.notes || "");
+  }, [evaluation]);
   if (!evaluation) return null;
 
   const risk = riskConfig[evaluation.riskLevel];
@@ -162,7 +170,7 @@ export default function EvaluationDetailModal({
           </div>
 
           {/* Status & Notes */}
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-gray-100 pt-4 space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <p className="text-xs text-gray-500 mb-2">حالة التقييم</p>
@@ -184,12 +192,24 @@ export default function EvaluationDetailModal({
               </div>
             </div>
 
-            {evaluation.notes && (
-              <div className="mt-4 bg-amber-50 rounded-xl p-3 border border-amber-200">
-                <p className="text-xs text-amber-700 font-semibold mb-1">ملاحظات</p>
-                <p className="text-sm text-amber-800">{evaluation.notes}</p>
+            <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 space-y-2">
+              <p className="text-xs text-amber-700 font-semibold mb-1">ملاحظات المتابعة</p>
+              <textarea
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                placeholder="أدخل ملاحظات حول حالة المريض أو تفاصيل التواصل..."
+                className="w-full text-sm bg-white border border-amber-200 rounded-lg p-2.5 text-amber-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                rows={3}
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={() => onSaveNotes(notesText)}
+                  className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  حفظ الملاحظة
+                </button>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Actions */}

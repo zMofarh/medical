@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { aboutTeam } from "@/mocks/aboutData";
+import { AboutTeamMember } from "@/types/cms";
 
-type TeamData = typeof aboutTeam;
+type TeamData = AboutTeamMember[];
 type TeamMember = TeamData[number];
 
 interface Props {

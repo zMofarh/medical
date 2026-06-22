@@ -1,6 +1,6 @@
+import { useDataContext } from "@/context/DataContext";
 import { useState } from "react";
 import { usePublicDoctors } from "@/hooks/useCMSDoctors";
-import { servicesData } from "@/mocks/servicesData";
 
 const visitTypes = [
   { id: "first",       label: "زيارة أولى",  icon: "ri-user-add-line",         desc: "للمرضى الجدد" },
@@ -27,6 +27,8 @@ export default function StepDoctor({
   onNext,
   onBack,
 }: StepDoctorProps) {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const [search, setSearch] = useState("");
   const { doctors: doctorsDetailed } = usePublicDoctors();
 

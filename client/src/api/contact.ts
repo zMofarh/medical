@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'http://localhost:8000/api/contact';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/contact`;
 
 export interface ContactMessageCreate {
   full_name: string;
@@ -17,7 +18,7 @@ export interface ContactMessageResponse extends ContactMessageCreate {
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 export async function submitContactMessage(data: ContactMessageCreate): Promise<{ message: string; id: string }> {
-  const res = await fetch(`${API_BASE_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export async function submitContactMessage(data: ContactMessageCreate): Promise<
 
 export async function getContactMessages(skip = 0, limit = 100): Promise<ContactMessageResponse[]> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/?skip=${skip}&limit=${limit}`, {
+  const res = await fetch(`${LOCAL_API_URL}/?skip=${skip}&limit=${limit}`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }
@@ -54,7 +55,7 @@ export async function getContactMessages(skip = 0, limit = 100): Promise<Contact
 
 export async function updateContactStatus(id: string, status: string): Promise<ContactMessageResponse> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}/status`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}/status`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -78,7 +79,7 @@ export async function updateContactStatus(id: string, status: string): Promise<C
 
 export async function deleteContactMessage(id: string): Promise<{ message: string }> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`
@@ -97,3 +98,4 @@ export async function deleteContactMessage(id: string): Promise<{ message: strin
 
   return res.json();
 }
+

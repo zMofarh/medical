@@ -309,22 +309,16 @@ export default function AdminSettings() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">OpenAI API Key</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">OpenAI API Key (إعداد آمن بالباك اند)</label>
                     <input
-                      type="password"
-                      id="openai_api_key"
-                      placeholder="sk-..."
-                      defaultValue={localStorage.getItem("openai_api_key") || ""}
-                      onChange={(e) => {
-                        if (e.target.value.trim()) {
-                          localStorage.setItem("openai_api_key", e.target.value.trim());
-                        }
-                      }}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#2E4E45] focus:ring-2 focus:ring-[#2E4E45]/10 font-mono"
+                      type="text"
+                      disabled
+                      value="تتم إدارة المفتاح بأمان في ملف .env على خادم الباك اند"
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-100 bg-gray-50 text-gray-500 text-sm focus:outline-none font-medium cursor-not-allowed"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      <i className="ri-lock-line ml-1"></i>
-                      المفتاح يُحفظ في متصفح المستخدم فقط (localStorage) ولا يُرسل لأي خادم
+                      <i className="ri-shield-check-line ml-1 text-emerald-600"></i>
+                      تم نقل معالجة الذكاء الاصطناعي للباك اند بالكامل لحماية المفتاح وتأمين استهلاك الرصيد.
                     </p>
                   </div>
 

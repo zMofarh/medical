@@ -15,20 +15,8 @@ const urgencyConfig: Record<string, { label: string; color: string; bg: string; 
 export default function AIReportSection({ data }: AIReportSectionProps) {
   const { generateReport, loading, error, report } = useAIReport();
   const [showReport, setShowReport] = useState(false);
-  const [apiKeyMissing, setApiKeyMissing] = useState(false);
-  const [apiKeyInput, setApiKeyInput] = useState("");
-
-  useEffect(() => {
-    const key = localStorage.getItem("openai_api_key");
-    setApiKeyMissing(!key);
-  }, []);
 
   const handleGenerate = async () => {
-    if (apiKeyMissing && !apiKeyInput.trim()) return;
-    if (apiKeyInput.trim()) {
-      localStorage.setItem("openai_api_key", apiKeyInput.trim());
-      setApiKeyMissing(false);
-    }
     try {
       await generateReport(data);
       setShowReport(true);
@@ -36,63 +24,6 @@ export default function AIReportSection({ data }: AIReportSectionProps) {
       // error handled in hook
     }
   };
-
-  const handleSaveKey = () => {
-    if (apiKeyInput.trim()) {
-      localStorage.setItem("openai_api_key", apiKeyInput.trim());
-      setApiKeyMissing(false);
-    }
-  };
-
-  if (apiKeyMissing) {
-    return (
-      <div className="bg-white rounded-2xl border border-brand-cream-200 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 flex items-center justify-center bg-violet-100 rounded-xl">
-            <i className="ri-brain-line text-violet-700 text-lg"></i>
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-900">التقرير الذكي بالذكاء الاصطناعي</h3>
-            <p className="text-xs text-gray-500">تقرير طبي شخصي مكتوب بالذكاء الاصطناعي</p>
-          </div>
-        </div>
-
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-          <div className="flex items-start gap-2">
-            <i className="ri-key-line text-amber-600 mt-0.5"></i>
-            <div>
-              <p className="text-sm font-semibold text-amber-800 mb-1">مطلوب مفتاح OpenAI API</p>
-              <p className="text-xs text-amber-700 leading-relaxed">
-                لإنشاء التقارير الذكية، أدخل مفتاح OpenAI API الخاص بك. المفتاح يُحفظ في متصفحك فقط ولا يُرسل لأي خادم.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <input
-            type="password"
-            placeholder="sk-..."
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-forest-200"
-          />
-          <button
-            onClick={handleSaveKey}
-            disabled={!apiKeyInput.trim()}
-            className="px-5 py-2.5 bg-brand-forest-700 text-white text-sm font-bold rounded-xl hover:bg-brand-forest-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
-          >
-            حفظ المفتاح
-          </button>
-        </div>
-
-        <p className="text-xs text-gray-400 mt-2">
-          <i className="ri-lock-line ml-1"></i>
-          المفتاح يُحفظ محلياً في متصفحك فقط
-        </p>
-      </div>
-    );
-  }
 
   if (!showReport && !report) {
     return (

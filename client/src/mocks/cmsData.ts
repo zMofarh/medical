@@ -61,6 +61,14 @@ export interface CMSTestimonialsSection {
   heading: string;
   description: string;
   items: CMSTestimonialItem[];
+  config?: {
+    sectionBadge?: string;
+    sectionTitle?: string;
+    sectionSubtitle?: string;
+    displayStyle?: string;
+    showRating?: boolean;
+    showImage?: boolean;
+  };
 }
 
 export interface CMSContent {

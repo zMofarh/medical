@@ -1,6 +1,6 @@
-import { contactWorkingHours } from "@/mocks/contactData";
+import { ContactWorkingHours } from "@/types/cms";
 
-type HoursData = typeof contactWorkingHours;
+type HoursData = ContactWorkingHours;
 type HourRow = HoursData[number];
 
 interface Props { data: HoursData; onChange: (d: HoursData) => void; }

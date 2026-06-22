@@ -4,9 +4,9 @@ import subprocess
 
 # تحديد مسار بايثون الخاص بالبيئة الافتراضية
 if os.name == "nt":  # Windows
-    venv_python = os.path.join(".venv", "Scripts", "python.exe")
+    venv_python = os.path.join("../.venv", "Scripts", "python.exe")
 else:  # Linux/Mac
-    venv_python = os.path.join(".venv", "bin", "python")
+    venv_python = os.path.join("../.venv", "bin", "python")
 
 if not os.path.exists(venv_python):
     print("Error: Virtual environment .venv not found.")
@@ -15,7 +15,7 @@ if not os.path.exists(venv_python):
 
 # الأمر لتشغيل uvicorn
 command = [venv_python, "-m", "uvicorn", "app.main:app", "--reload", "--port", "8000"]
-
+print(command)
 print("Starting FastAPI server on http://127.0.0.1:8000 ...")
 try:
     subprocess.run(command, check=True)

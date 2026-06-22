@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { searchCTAData, type SearchCTAData } from "@/mocks/searchPageData";
+import { SearchCTAData } from "@/types/cms";
 
 const ICON_OPTIONS = [
   "ri-dna-line", "ri-heart-pulse-line", "ri-microscope-line", "ri-hospital-line",
@@ -7,15 +6,12 @@ const ICON_OPTIONS = [
   "ri-award-line", "ri-brain-line",
 ];
 
-export default function SearchCTAEditor() {
-  const [data, setData] = useState<SearchCTAData>(searchCTAData);
-  const [saved, setSaved] = useState(false);
+interface SearchCTAEditorProps {
+  data: SearchCTAData;
+  onChange: (d: SearchCTAData) => void;
+}
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
+export default function SearchCTAEditor({ data, onChange }: SearchCTAEditorProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-5">
@@ -28,28 +24,17 @@ export default function SearchCTAEditor() {
             <p className="text-xs text-gray-400">يظهر أسفل الصفحة عند عدم وجود بحث</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setData({ ...data, active: !data.active })}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
-              data.active
-                ? "border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
-                : "border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100"
-            }`}
-          >
-            <i className={`${data.active ? "ri-eye-line" : "ri-eye-off-line"} text-sm`}></i>
-            {data.active ? "ظاهر" : "مخفي"}
-          </button>
-          <button
-            onClick={handleSave}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-              saved ? "bg-green-500 text-white" : "bg-[#2E4E45] text-white hover:bg-[#243d36]"
-            }`}
-          >
-            <i className={saved ? "ri-check-line" : "ri-save-line"}></i>
-            {saved ? "تم الحفظ!" : "حفظ"}
-          </button>
-        </div>
+        <button
+          onClick={() => onChange({ ...data, active: !data.active })}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+            data.active
+              ? "border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+              : "border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100"
+          }`}
+        >
+          <i className={`${data.active ? "ri-eye-line" : "ri-eye-off-line"} text-sm`}></i>
+          {data.active ? "ظاهر" : "مخفي"}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -58,7 +43,7 @@ export default function SearchCTAEditor() {
           <input
             type="text"
             value={data.title}
-            onChange={(e) => setData({ ...data, title: e.target.value })}
+            onChange={(e) => onChange({ ...data, title: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -66,8 +51,8 @@ export default function SearchCTAEditor() {
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">النص التوضيحي</label>
           <input
             type="text"
-            value={data.subtitle}
-            onChange={(e) => setData({ ...data, subtitle: e.target.value })}
+            value={data.subtitle || ""}
+            onChange={(e) => onChange({ ...data, subtitle: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -75,8 +60,8 @@ export default function SearchCTAEditor() {
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">نص الزر</label>
           <input
             type="text"
-            value={data.ctaLabel}
-            onChange={(e) => setData({ ...data, ctaLabel: e.target.value })}
+            value={data.ctaLabel || data.buttonText || ""}
+            onChange={(e) => onChange({ ...data, ctaLabel: e.target.value, buttonText: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -84,8 +69,8 @@ export default function SearchCTAEditor() {
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">مسار الزر (Path)</label>
           <input
             type="text"
-            value={data.ctaPath}
-            onChange={(e) => setData({ ...data, ctaPath: e.target.value })}
+            value={data.ctaPath || ""}
+            onChange={(e) => onChange({ ...data, ctaPath: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
             placeholder="/services"
           />
@@ -96,7 +81,7 @@ export default function SearchCTAEditor() {
             {ICON_OPTIONS.map((icon) => (
               <button
                 key={icon}
-                onClick={() => setData({ ...data, icon })}
+                onClick={() => onChange({ ...data, icon })}
                 className={`w-10 h-10 flex items-center justify-center rounded-lg border transition-all cursor-pointer ${
                   data.icon === icon ? "border-[#2E4E45] bg-[#2E4E45]/10" : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
@@ -120,7 +105,7 @@ export default function SearchCTAEditor() {
           </div>
         </div>
         <div className="bg-[#C8A96E] text-[#1a3530] text-xs font-black px-5 py-2.5 rounded-xl whitespace-nowrap">
-          {data.ctaLabel}
+          {data.ctaLabel || data.buttonText}
         </div>
       </div>
     </div>

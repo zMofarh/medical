@@ -1,17 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  searchHeroData,
-  popularSearchesData,
-  quickLinksData,
-  searchCTAData,
-  searchResultsConfig,
-  type SearchHeroData,
-  type PopularSearch,
-  type QuickLink,
-  type SearchCTAData,
-  type SearchResultsConfig,
-} from "@/mocks/searchPageData";
 import { useDataContext } from "@/context/DataContext";
+import { PopularSearch, QuickLink, SearchCTAData, SearchHeroData, SearchResultsConfig } from "@/types/cms";
 
 export function useCMSSearch() {
   const {
@@ -21,7 +10,6 @@ export function useCMSSearch() {
     searchCTA: globalCTA,
     searchResultsConfig: globalResultsConfig,
     saveSearch,
-    resetSearch,
   } = useDataContext();
 
   const [hero, setHero]                   = useState<SearchHeroData>(globalHero);
@@ -68,9 +56,13 @@ export function useCMSSearch() {
   const updateResultsConfig = useCallback((d: SearchResultsConfig) => { setResultsConfig(d); setHasChanges(true); }, []);
 
   const reset = useCallback(() => {
-    resetSearch();
+    setHero(globalHero);
+    setPopular(globalPopular);
+    setQuickLinks(globalQuickLinks);
+    setCta(globalCTA);
+    setResultsConfig(globalResultsConfig);
     setHasChanges(false);
-  }, [resetSearch]);
+  }, [globalHero, globalPopular, globalQuickLinks, globalCTA, globalResultsConfig]);
 
   return {
     hero, popular, quickLinks, cta, resultsConfig,

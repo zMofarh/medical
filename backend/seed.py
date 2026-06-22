@@ -16,7 +16,13 @@ from app.models import (
     BlogCategory,
     BlogPost,
     Booking,
-    ContactMessage
+    ContactMessage,
+    SystemSettings,
+    AIReport,
+    CMSAbout,
+    CMSContact,
+    CMSOffers,
+    CMSSearch
 )
 
 def seed_db():
@@ -31,9 +37,15 @@ def seed_db():
         db.query(CMSDoctor).delete()
         db.query(CMSService).delete()
         db.query(CMSHome).delete()
+        db.query(CMSAbout).delete()
+        db.query(CMSContact).delete()
+        db.query(CMSOffers).delete()
+        db.query(CMSSearch).delete()
         db.query(User).delete()
         db.query(Booking).delete()
         db.query(ContactMessage).delete()
+        db.query(AIReport).delete()
+        db.query(SystemSettings).delete()
         db.commit()
         print("Database tables cleared successfully.")
 
@@ -92,6 +104,56 @@ def seed_db():
         db.add_all(users)
         db.commit()
         print(f"Seeded {len(users)} users.")
+
+        # 2.5 Seed System Settings
+        print("Seeding System Settings...")
+        default_settings = SystemSettings(
+            clinic_name="ذا مديكال أفينيو",
+            phone="0500000000",
+            email="info@medicalavenue.com",
+            whatsapp="0500000000",
+            address="الرياض, المملكة العربية السعودية",
+            working_hours={
+                "saturday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "sunday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "monday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "tuesday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "wednesday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "thursday": {"isOpen": True, "open": "09:00", "close": "21:00"},
+                "friday": {"isOpen": False, "open": "00:00", "close": "00:00"}
+            },
+            maintenance_mode=False,
+            seo={
+                "defaultTitle": "ذا مديكال أفينيو | مركز الطب الدقيق",
+                "defaultDescription": "عيادة متخصصة في الطب الدقيق والوظيفي بأسلوب علمي متكامل.",
+                "ogImage": "https://example.com/og-image.jpg"
+            },
+            pixels={
+                "facebook": "FB-123456789",
+                "snapchat": "SNAP-123456789",
+                "tiktok": "TT-123456789",
+                "googleAnalytics": "G-123456789"
+            },
+            chatbot={
+                "enabled": True,
+                "welcomeMessage": "مرحباً بك في ذا مديكال أفينيو. كيف يمكننا مساعدتك اليوم؟",
+                "faqs": [
+                    {"q": "متى أوقات العمل؟", "a": "نعمل من السبت إلى الخميس من 9 صباحاً حتى 9 مساءً."},
+                    {"q": "هل تقبلون التأمين؟", "a": "نعم، نقبل معظم شركات التأمين الرئيسية."}
+                ]
+            },
+            ai={
+                "openaiKey": "sk-mock-key-1234567890",
+                "defaultModel": "gpt-4-turbo"
+            },
+            appearance={
+                "primaryColor": "#0F766E",
+                "logoUrl": "/images/logo.png"
+            }
+        )
+        db.add(default_settings)
+        db.commit()
+        print("Seeded System Settings.")
 
         # 3. Seed CMS Home
         print("Seeding CMS Home Content...")
@@ -176,7 +238,54 @@ def seed_db():
         db.commit()
         print("Seeded CMS Home Content.")
 
-        # 4. Seed CMSService
+        # 3.2 Seed CMS About
+        print("Seeding CMS About Content...")
+        cms_about = CMSAbout(
+            hero={"badge": "من نحن", "title": "ذا مديكال أفينيو", "subtitle": "منصة الطب الدقيق"},
+            story={"title": "من سؤال بسيط إلى منصة طب دقيق", "paragraphs": ["بدأت ذا مديكال أفينيو..."]},
+            mission=[{"title": "رسالتنا", "body": "تقديم طب أعمق"}],
+            values=[{"title": "نفهم قبل أن نقرر"}],
+            timeline=[{"year": "2018", "title": "التأسيس"}],
+            team=[{"name": "د. فيصل الأحمد", "role": "المدير الطبي"}],
+            awards=[{"title": "منصة الطب الدقيق الأولى"}]
+        )
+        db.add(cms_about)
+        
+        # 3.3 Seed CMS Contact
+        print("Seeding CMS Contact Content...")
+        cms_contact = CMSContact(
+            hero={"title": "كيف يمكننا مساعدتك؟"},
+            methods=[{"title": "اتصل بنا", "value": "+966 11 234 5678"}],
+            form_config={"title": "تواصل معنا"},
+            map_config={"title": "موقعنا على الخريطة"},
+            cta_banner={"title": "احجز جلسة تقييم"},
+            faq_teaser={"title": "هل لديك أسئلة؟"}
+        )
+        db.add(cms_contact)
+
+        # 3.4 Seed CMS Offers
+        print("Seeding CMS Offers Content...")
+        cms_offers = CMSOffers(
+            hero={"title": "عروض موسمية لا تُفوَّت"},
+            how_to_redeem=[{"title": "اختر الباقة"}],
+            notify={"title": "لا تفوّت أي عرض قادم!"}
+        )
+        db.add(cms_offers)
+
+        # 3.5 Seed CMS Search
+        print("Seeding CMS Search Content...")
+        cms_search = CMSSearch(
+            hero={"title": "ابحث في عيادة الطب الدقيق"},
+            popular_searches=[{"label": "الطب الدقيق"}],
+            quick_links=[{"label": "احجز موعداً"}],
+            cta={"title": "هل تبحث عن الطب الدقيق؟"},
+            results_config={"showDoctors": True}
+        )
+        db.add(cms_search)
+        db.commit()
+        print("Seeded additional CMS Pages.")
+
+        # 4. Seed CMSServices
         print("Seeding CMSServices...")
         services = [
             CMSService(

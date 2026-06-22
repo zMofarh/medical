@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { aboutTimeline } from "@/mocks/aboutData";
+import { AboutTimelineEvent } from "@/types/cms";
 
-type TimelineData = typeof aboutTimeline;
+type TimelineData = AboutTimelineEvent[];
 type TimelineItem = TimelineData[number];
 
 interface Props {

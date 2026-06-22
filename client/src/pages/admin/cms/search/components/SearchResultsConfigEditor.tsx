@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { searchResultsConfig, type SearchResultsConfig } from "@/mocks/searchPageData";
+import { SearchResultsConfig } from "@/types/cms";
 
 interface SectionToggleProps {
   icon: string;
@@ -63,15 +62,12 @@ function SectionToggle({
   );
 }
 
-export default function SearchResultsConfigEditor() {
-  const [config, setConfig] = useState<SearchResultsConfig>(searchResultsConfig);
-  const [saved, setSaved] = useState(false);
+interface SearchResultsConfigEditorProps {
+  data: SearchResultsConfig;
+  onChange: (d: SearchResultsConfig) => void;
+}
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
+export default function SearchResultsConfigEditor({ data, onChange }: SearchResultsConfigEditorProps) {
   const sections = [
     {
       key: "Doctors" as const,
@@ -131,15 +127,6 @@ export default function SearchResultsConfigEditor() {
             <p className="text-xs text-gray-400">تحكم في الأقسام الظاهرة وعدد النتائج</p>
           </div>
         </div>
-        <button
-          onClick={handleSave}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-            saved ? "bg-green-500 text-white" : "bg-[#2E4E45] text-white hover:bg-[#243d36]"
-          }`}
-        >
-          <i className={saved ? "ri-check-line" : "ri-save-line"}></i>
-          {saved ? "تم الحفظ!" : "حفظ"}
-        </button>
       </div>
 
       {/* Info */}
@@ -161,11 +148,11 @@ export default function SearchResultsConfigEditor() {
             iconColor={section.iconColor}
             label={section.label}
             description={section.description}
-            enabled={config[section.enabledKey] as boolean}
-            previewCount={config[section.countKey] as number}
+            enabled={data[section.enabledKey] as boolean}
+            previewCount={data[section.countKey] as number}
             maxPreview={section.maxPreview}
-            onToggle={() => setConfig({ ...config, [section.enabledKey]: !config[section.enabledKey] })}
-            onCountChange={(val) => setConfig({ ...config, [section.countKey]: val })}
+            onToggle={() => onChange({ ...data, [section.enabledKey]: !data[section.enabledKey] })}
+            onCountChange={(val) => onChange({ ...data, [section.countKey]: val })}
           />
         ))}
       </div>
@@ -175,9 +162,9 @@ export default function SearchResultsConfigEditor() {
         <p className="text-xs font-semibold text-gray-600 mb-2">ملخص الإعدادات الحالية:</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {sections.map((section) => (
-            <div key={section.key} className={`text-center p-2 rounded-lg ${config[section.enabledKey] ? "bg-white border border-gray-200" : "bg-gray-100"}`}>
-              <div className={`text-lg font-black ${config[section.enabledKey] ? "text-[#2E4E45]" : "text-gray-300"}`}>
-                {config[section.enabledKey] ? config[section.countKey] : "—"}
+            <div key={section.key} className={`text-center p-2 rounded-lg ${data[section.enabledKey] ? "bg-white border border-gray-200" : "bg-gray-100"}`}>
+              <div className={`text-lg font-black ${data[section.enabledKey] ? "text-[#2E4E45]" : "text-gray-300"}`}>
+                {data[section.enabledKey] ? data[section.countKey] : "—"}
               </div>
               <div className="text-[10px] text-gray-500">{section.label.replace("قسم ", "")}</div>
             </div>

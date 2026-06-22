@@ -1,12 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { clinicInfo, workingHours, socialMedia, emergencyContact } from "@/mocks/clinicSettings";
 import { useDataContext } from "@/context/DataContext";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-export type ClinicInfo = typeof clinicInfo;
-export type WorkingHours = typeof workingHours;
-export type SocialMedia = typeof socialMedia;
-export type EmergencyContact = typeof emergencyContact;
+import { ClinicInfo, EmergencyContact, SocialMedia, WorkingHours } from "@/types/cms";
 
 export interface ClinicSettings {
   info: ClinicInfo;
@@ -35,7 +29,6 @@ export function useCMSSettings() {
     clinicSocial: globalSocial,
     clinicEmergency: globalEmergency,
     saveSettings,
-    resetSettings,
   } = useDataContext();
 
   const [info, setInfo]           = useState<ClinicInfo>(globalInfo);
@@ -71,9 +64,12 @@ export function useCMSSettings() {
   const updateEmergency = useCallback((d: EmergencyContact) => { setEmergency(d); setHasChanges(true); }, []);
 
   const reset = useCallback(() => {
-    resetSettings();
+    setInfo(globalInfo);
+    setHours(globalHours);
+    setSocial(globalSocial);
+    setEmergency(globalEmergency);
     setHasChanges(false);
-  }, [resetSettings]);
+  }, [globalInfo, globalHours, globalSocial, globalEmergency]);
 
   return {
     info, hours, social, emergency,
@@ -83,3 +79,4 @@ export function useCMSSettings() {
   };
 }
 export type { ClinicSettings as IClinicSettings };
+export type { ClinicInfo, EmergencyContact, SocialMedia, WorkingHours };

@@ -1,0 +1,8 @@
+node_modules
+out
+dist
+.git
+.env
+.gitignore
+Dockerfile
+nginx.conf

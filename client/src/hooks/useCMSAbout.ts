@@ -1,22 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  aboutHero,
-  aboutStory,
-  aboutMission,
-  aboutValues,
-  aboutTimeline,
-  aboutTeam,
-  aboutAwards,
-} from "@/mocks/aboutData";
 import { useDataContext } from "@/context/DataContext";
-
-type AboutHero     = typeof aboutHero;
-type AboutStory    = typeof aboutStory;
-type AboutMission  = typeof aboutMission;
-type AboutValues   = typeof aboutValues;
-type AboutTimeline = typeof aboutTimeline;
-type AboutTeam     = typeof aboutTeam;
-type AboutAwards   = typeof aboutAwards;
+import { AboutAward, AboutHeroData, AboutMission, AboutStoryData, AboutTeamMember, AboutTimelineEvent, AboutValue } from "@/types/cms";
 
 // ─── Public hook (read-only, reactive) ───────────────────────────────────────
 export function usePublicAbout() {
@@ -44,16 +28,15 @@ export function useCMSAbout() {
     aboutTeam: globalTeam,
     aboutAwards: globalAwards,
     saveAbout,
-    resetAbout,
   } = useDataContext();
 
-  const [hero, setHero]         = useState<AboutHero>(globalHero);
-  const [story, setStory]        = useState<AboutStory>(globalStory);
-  const [mission, setMission]    = useState<AboutMission>(globalMission);
-  const [values, setValues]      = useState<AboutValues>(globalValues);
-  const [timeline, setTimeline]  = useState<AboutTimeline>(globalTimeline);
-  const [team, setTeam]          = useState<AboutTeam>(globalTeam);
-  const [awards, setAwards]      = useState<AboutAwards>(globalAwards);
+  const [hero, setHero]         = useState<AboutHeroData>(globalHero);
+  const [story, setStory]        = useState<AboutStoryData>(globalStory);
+  const [mission, setMission]    = useState<AboutMission[]>(globalMission);
+  const [values, setValues]      = useState<AboutValue[]>(globalValues);
+  const [timeline, setTimeline]  = useState<AboutTimelineEvent[]>(globalTimeline);
+  const [team, setTeam]          = useState<AboutTeamMember[]>(globalTeam);
+  const [awards, setAwards]      = useState<AboutAward[]>(globalAwards);
   
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [hasChanges, setHasChanges] = useState(false);
@@ -70,13 +53,13 @@ export function useCMSAbout() {
   }, [globalHero, globalStory, globalMission, globalValues, globalTimeline, globalTeam, globalAwards]);
 
   const save = useCallback(async (data: {
-    hero: AboutHero;
-    story: AboutStory;
-    mission: AboutMission;
-    values: AboutValues;
-    timeline: AboutTimeline;
-    team: AboutTeam;
-    awards: AboutAwards;
+    hero: AboutHeroData;
+    story: AboutStoryData;
+    mission: AboutMission[];
+    values: AboutValue[];
+    timeline: AboutTimelineEvent[];
+    team: AboutTeamMember[];
+    awards: AboutAward[];
   }) => {
     setSaveStatus("saving");
     try {
@@ -91,18 +74,24 @@ export function useCMSAbout() {
     }
   }, [saveAbout]);
 
-  const updateHero     = useCallback((d: AboutHero)     => { setHero(d);     setHasChanges(true); }, []);
-  const updateStory    = useCallback((d: AboutStory)    => { setStory(d);    setHasChanges(true); }, []);
-  const updateMission  = useCallback((d: AboutMission)  => { setMission(d);  setHasChanges(true); }, []);
-  const updateValues   = useCallback((d: AboutValues)   => { setValues(d);   setHasChanges(true); }, []);
-  const updateTimeline = useCallback((d: AboutTimeline) => { setTimeline(d); setHasChanges(true); }, []);
-  const updateTeam     = useCallback((d: AboutTeam)     => { setTeam(d);     setHasChanges(true); }, []);
-  const updateAwards   = useCallback((d: AboutAwards)   => { setAwards(d);   setHasChanges(true); }, []);
+  const updateHero     = useCallback((d: AboutHeroData)     => { setHero(d);     setHasChanges(true); }, []);
+  const updateStory    = useCallback((d: AboutStoryData)    => { setStory(d);    setHasChanges(true); }, []);
+  const updateMission  = useCallback((d: AboutMission[])  => { setMission(d);  setHasChanges(true); }, []);
+  const updateValues   = useCallback((d: AboutValue[])   => { setValues(d);   setHasChanges(true); }, []);
+  const updateTimeline = useCallback((d: AboutTimelineEvent[]) => { setTimeline(d); setHasChanges(true); }, []);
+  const updateTeam     = useCallback((d: AboutTeamMember[])     => { setTeam(d);     setHasChanges(true); }, []);
+  const updateAwards   = useCallback((d: AboutAward[])   => { setAwards(d);   setHasChanges(true); }, []);
 
   const reset = useCallback(() => {
-    resetAbout();
+    setHero(globalHero);
+    setStory(globalStory);
+    setMission(globalMission);
+    setValues(globalValues);
+    setTimeline(globalTimeline);
+    setTeam(globalTeam);
+    setAwards(globalAwards);
     setHasChanges(false);
-  }, [resetAbout]);
+  }, [globalHero, globalStory, globalMission, globalValues, globalTimeline, globalTeam, globalAwards]);
 
   return {
     hero, story, mission, values, timeline, team, awards,
@@ -111,3 +100,4 @@ export function useCMSAbout() {
     save, reset,
   };
 }
+export type { AboutMission, AboutHeroData, AboutStoryData, AboutTeamMember, AboutTimelineEvent, AboutValue, AboutAward };

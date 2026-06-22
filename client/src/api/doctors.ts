@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'http://localhost:8000/api/doctors';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/doctors`;
 
 export interface CMSDoctorCreate {
   doctor_id: string;
@@ -30,20 +31,20 @@ export interface CMSDoctorResponse extends CMSDoctorCreate {
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 export async function getDoctors(skip = 0, limit = 100): Promise<CMSDoctorResponse[]> {
-  const res = await fetch(`${API_BASE_URL}/?skip=${skip}&limit=${limit}`);
+  const res = await fetch(`${LOCAL_API_URL}/?skip=${skip}&limit=${limit}`);
   if (!res.ok) throw new Error("Failed to fetch doctors");
   return res.json();
 }
 
 export async function getDoctorById(id: string): Promise<CMSDoctorResponse> {
-  const res = await fetch(`${API_BASE_URL}/${id}`);
+  const res = await fetch(`${LOCAL_API_URL}/${id}`);
   if (!res.ok) throw new Error("Failed to fetch doctor details");
   return res.json();
 }
 
 export async function createDoctor(data: CMSDoctorCreate): Promise<CMSDoctorResponse> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +68,7 @@ export async function createDoctor(data: CMSDoctorCreate): Promise<CMSDoctorResp
 
 export async function updateDoctor(id: string, data: CMSDoctorUpdate): Promise<CMSDoctorResponse> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -91,7 +92,7 @@ export async function updateDoctor(id: string, data: CMSDoctorUpdate): Promise<C
 
 export async function deleteDoctor(id: string): Promise<{ message: string }> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`
@@ -110,3 +111,4 @@ export async function deleteDoctor(id: string): Promise<{ message: string }> {
 
   return res.json();
 }
+

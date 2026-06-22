@@ -7,3 +7,5 @@ tests/
 scratch/
 The_Medical_Avenue_API.postman_collection.json
 tasks.md
+medical.db
+*.db

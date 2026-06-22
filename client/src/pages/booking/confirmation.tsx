@@ -1,8 +1,8 @@
+import { useDataContext } from "@/context/DataContext";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/feature/Navbar";
 import Footer from "@/components/feature/Footer";
-import { allPackages } from "@/mocks/packagesData";
 import { usePublicDoctors } from "@/hooks/useCMSDoctors";
 import AddToCalendar from "@/pages/booking/components/AddToCalendar";
 import BookingRefCard from "@/pages/booking/components/BookingRefCard";
@@ -37,6 +37,8 @@ const accentMap: Record<string, { bg: string; text: string; border: string; icon
 };
 
 export default function BookingConfirmationPage() {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as BookingConfirmationState | null;

@@ -9,8 +9,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: medical_db
-    ports:
-      - "5432:5432"
+    # Kept internal to the docker network for security (not exposed to the public internet)
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -18,18 +19,31 @@ services:
     build: ./backend
     container_name: medical_backend
     restart: always
-    ports:
-      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/medical_db
-      - SECRET_KEY=a_very_secret_key_123_change_me_in_production
+      - SECRET_KEY=${SECRET_KEY:-a_very_secret_key_123_change_me_in_production}
       - ACCESS_TOKEN_EXPIRE_MINUTES=60
       - PROJECT_NAME=The Medical Avenue API
-    volumes:
-      - ./backend:/app
+      - SHOW_DOCS=False
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    # Accessed internally by the client Nginx container
+    expose:
+      - "8000"
     depends_on:
       - db
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # Wait for the DB, run alembic migrations, then launch uvicorn
+    command: >
+      sh -c "alembic upgrade head && 
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  client:
+    build: ./client
+    container_name: medical_client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

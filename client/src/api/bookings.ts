@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:8000/api/bookings';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/bookings`;
 
 export interface BookingCreate {
   full_name: string;
@@ -23,7 +24,7 @@ export interface BookingResponse extends BookingCreate {
 }
 
 export async function createBooking(data: BookingCreate): Promise<{ message: string; booking_ref: string }> {
-  const response = await fetch(`${API_BASE_URL}/`, {
+  const response = await fetch(`${LOCAL_API_URL}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ export async function createBooking(data: BookingCreate): Promise<{ message: str
 }
 
 export async function getBookings(token: string, skip = 0, limit = 100): Promise<BookingResponse[]> {
-  const response = await fetch(`${API_BASE_URL}/?skip=${skip}&limit=${limit}`, {
+  const response = await fetch(`${LOCAL_API_URL}/?skip=${skip}&limit=${limit}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -57,7 +58,7 @@ export async function getBookings(token: string, skip = 0, limit = 100): Promise
 }
 
 export async function updateBookingStatus(bookingId: string, status: string, token: string): Promise<BookingResponse> {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
+  const response = await fetch(`${LOCAL_API_URL}/${bookingId}/status`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -75,7 +76,7 @@ export async function updateBookingStatus(bookingId: string, status: string, tok
 }
 
 export async function deleteBooking(bookingId: string, token: string): Promise<{ message: string }> {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}`, {
+  const response = await fetch(`${LOCAL_API_URL}/${bookingId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -89,3 +90,4 @@ export async function deleteBooking(bookingId: string, token: string): Promise<{
 
   return response.json();
 }
+

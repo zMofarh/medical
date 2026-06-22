@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { contactMapConfig } from "@/mocks/contactData";
+import { ContactMapConfig } from "@/types/cms";
 
-type MapData = typeof contactMapConfig;
+type MapData = ContactMapConfig;
 interface Props { data: MapData; onChange: (d: MapData) => void; }
 
 export default function ContactMapEditor({ data, onChange }: Props) {

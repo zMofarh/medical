@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/feature/Navbar";
 import Footer from "@/components/feature/Footer";
-import { type PackageCategory, type MedicalPackage } from "@/mocks/packagesData";
 import { usePublicPackages } from "@/hooks/useCMSPackages";
+import { useDataContext, type MedicalPackage, type PackageCategory } from "@/context/DataContext";
 import { StarShape, SunShape, SwanShape, LotusShape } from "@/components/base/BrandShapes";
 import TypewriterText from "@/components/base/TypewriterText";
 import { trustStats } from "@/mocks/clinicData";
@@ -157,6 +157,8 @@ function CategorySection({
 }
 
 export default function PackagesPage() {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const { t, i18n } = useTranslation();
   const isAr = !i18n.language?.startsWith("en");
   const [activeCategory, setActiveCategory] = useState<PackageCategory | "all">("all");

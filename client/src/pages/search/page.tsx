@@ -1,11 +1,9 @@
+import { useDataContext } from "@/context/DataContext";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/feature/Navbar";
 import Footer from "@/components/feature/Footer";
 import { usePublicDoctors } from "@/hooks/useCMSDoctors";
-import { servicesData } from "@/mocks/servicesData";
-import { allPackages } from "@/mocks/packagesData";
-import { blogPosts } from "@/mocks/clinicData";
 import { usePublicSearch } from "@/hooks/useCMSSearch";
 
 type Tab = "all" | "doctors" | "services" | "packages" | "blog";
@@ -42,6 +40,8 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 }
 
 export default function SearchPage() {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "";
   const [query, setQuery] = useState(initialQuery);
@@ -565,7 +565,7 @@ export default function SearchPage() {
               {quickLinks.map((item) => (
                 <Link
                   key={item.id}
-                  to={item.path}
+                  to={item.path || item.url}
                   className={`flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold whitespace-nowrap cursor-pointer transition-all hover:-translate-y-0.5 ${
                     item.colorStyle === "primary"
                       ? "bg-brand-forest-600 text-white hover:bg-brand-forest-700"

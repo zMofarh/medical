@@ -7,6 +7,7 @@ import { StarShape, SunShape, SwanShape, LotusShape } from "@/components/base/Br
 import TypewriterText from "@/components/base/TypewriterText";
 import { usePublicContact } from "@/hooks/useCMSContact";
 import { submitContactMessage } from "@/api/contact";
+import { useDataContext } from "@/context/DataContext";
 
 type SubmitStatus = "idle" | "loading" | "success" | "error";
 
@@ -14,7 +15,8 @@ export default function Contact() {
   const { t, i18n } = useTranslation();
   const isAr = !i18n.language?.startsWith("en");
 
-  const { hero, methods, form, map, hours, social, cta, faq } = usePublicContact();
+  const { hero, methods, form, map, cta, faq } = usePublicContact();
+  const { clinicHours, clinicSocial } = useDataContext();
 
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [charCount, setCharCount] = useState(0);
@@ -277,14 +279,17 @@ export default function Contact() {
                   {t("contact.info.hours")}
                 </h3>
                 <div className="space-y-2.5">
-                  {hours.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between py-2.5 border-b border-brand-cream-100 last:border-0">
-                      <span className="text-sm text-gray-600 font-medium">{item.days}</span>
-                      <span className={`text-sm font-bold ${item.isOpen ? "text-brand-forest-600" : "text-red-400"}`}>
-                        {item.isOpen ? item.time : "مغلق"}
-                      </span>
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between py-2.5 border-b border-brand-cream-100">
+                    <span className="text-sm text-gray-600 font-medium">{isAr ? "السبت - الخميس" : "Saturday - Thursday"}</span>
+                    <span className="text-sm font-bold text-brand-forest-600">{clinicHours.regular}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2.5 border-b border-brand-cream-100 last:border-0">
+                    <span className="text-sm text-gray-600 font-medium">{isAr ? "الجمعة" : "Friday"}</span>
+                    <span className="text-sm font-bold text-red-400">{clinicHours.weekend}</span>
+                  </div>
+                  {clinicHours.note && (
+                    <p className="text-xs text-gray-400 mt-2 text-right">{clinicHours.note}</p>
+                  )}
                 </div>
               </div>
 
@@ -297,11 +302,16 @@ export default function Contact() {
                   {isAr ? "تابعنا على" : "Follow Us"}
                 </h3>
                 <div className="flex gap-3 flex-wrap">
-                  {social.filter((s) => s.enabled).map((s) => (
+                  {[
+                    { id: "twitter", platform: "twitter", icon: "ri-twitter-x-line", url: clinicSocial.twitter },
+                    { id: "instagram", platform: "instagram", icon: "ri-instagram-line", url: clinicSocial.instagram },
+                    { id: "linkedin", platform: "linkedin", icon: "ri-linkedin-line", url: clinicSocial.linkedin },
+                    { id: "snapchat", platform: "snapchat", icon: "ri-snapchat-line", url: clinicSocial.snapchat },
+                  ].filter((s) => s.url).map((s) => (
                     <a
                       key={s.id}
-                      href={s.url || "#"}
-                      title={s.label}
+                      href={s.url}
+                      title={s.platform}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-10 h-10 flex items-center justify-center bg-brand-cream-50 border border-brand-cream-200 rounded-xl text-gray-600 hover:bg-brand-forest-600 hover:text-white hover:border-brand-forest-600 transition-all duration-200 cursor-pointer"

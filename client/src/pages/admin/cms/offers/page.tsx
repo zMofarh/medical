@@ -2,9 +2,14 @@ import { useState } from "react";
 import AdminLayout from "@/pages/admin/components/AdminLayout";
 import { useCMSOffers } from "@/hooks/useCMSOffers";
 import type {
-  OffersHeroCMS, SeasonalOfferCMS, FlashDealCMS,
-  HowToRedeemStep, OffersNotifyCMS,
-} from "@/mocks/offersData";
+  OffersHeroData, SeasonalOffer, FlashDeal,
+  HowToRedeemStep, OffersNotifyData,
+} from "@/types/cms";
+
+type OffersHeroCMS = OffersHeroData;
+type SeasonalOfferCMS = SeasonalOffer;
+type FlashDealCMS = FlashDeal;
+type OffersNotifyCMS = OffersNotifyData;
 
 type TabId = "hero" | "seasonal" | "flash" | "redeem";
 
@@ -284,6 +289,7 @@ function FlashEditor({ data, onChange }: { data: FlashDealCMS[]; onChange: (d: F
     const newDeal: FlashDealCMS = {
       id: `fd-${Date.now()}`,
       packageId: "",
+      packageIds: [],
       flashDiscount: 25,
       endsIn: 48,
       label: "عرض جديد",
@@ -508,16 +514,32 @@ function RedeemEditor({
               <textarea value={notify.subtitle} onChange={(e) => onNotifyChange({ ...notify, subtitle: e.target.value })}
                 rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45] resize-none" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">نص الزر الأول</label>
-                <input value={notify.ctaPrimary} onChange={(e) => onNotifyChange({ ...notify, ctaPrimary: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-gray-100 rounded-xl p-3 space-y-2.5">
+                <label className="block text-xs font-bold text-[#2E4E45]">الزر الأول (الرئيسي)</label>
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-0.5">النص</label>
+                  <input value={notify.ctaPrimary?.text || ""} onChange={(e) => onNotifyChange({ ...notify, ctaPrimary: { text: e.target.value, link: notify.ctaPrimary?.link || "" } })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#2E4E45]" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-0.5">الرابط</label>
+                  <input value={notify.ctaPrimary?.link || ""} onChange={(e) => onNotifyChange({ ...notify, ctaPrimary: { text: notify.ctaPrimary?.text || "", link: e.target.value } })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#2E4E45]" />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">نص الزر الثاني</label>
-                <input value={notify.ctaSecondary} onChange={(e) => onNotifyChange({ ...notify, ctaSecondary: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]" />
+              <div className="border border-gray-100 rounded-xl p-3 space-y-2.5">
+                <label className="block text-xs font-bold text-[#2E4E45]">الزر الثاني (الفرعي)</label>
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-0.5">النص</label>
+                  <input value={notify.ctaSecondary?.text || ""} onChange={(e) => onNotifyChange({ ...notify, ctaSecondary: { text: e.target.value, link: notify.ctaSecondary?.link || "" } })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#2E4E45]" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-0.5">الرابط</label>
+                  <input value={notify.ctaSecondary?.link || ""} onChange={(e) => onNotifyChange({ ...notify, ctaSecondary: { text: notify.ctaSecondary?.text || "", link: e.target.value } })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#2E4E45]" />
+                </div>
               </div>
             </div>
           </div>
@@ -527,8 +549,8 @@ function RedeemEditor({
             <div className="text-xl font-black text-white mb-2">{notify.title}</div>
             <div className="text-white/70 text-sm mb-4 max-w-xs mx-auto">{notify.subtitle}</div>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <div className="bg-white text-[#2E4E45] font-bold px-5 py-2 rounded-full text-sm whitespace-nowrap">{notify.ctaPrimary}</div>
-              <div className="border-2 border-white/50 text-white font-bold px-5 py-2 rounded-full text-sm whitespace-nowrap">{notify.ctaSecondary}</div>
+              <div className="bg-white text-[#2E4E45] font-bold px-5 py-2 rounded-full text-sm whitespace-nowrap">{notify.ctaPrimary?.text || ""}</div>
+              <div className="border-2 border-white/50 text-white font-bold px-5 py-2 rounded-full text-sm whitespace-nowrap">{notify.ctaSecondary?.text || ""}</div>
             </div>
           </div>
         </div>

@@ -8,22 +8,33 @@ import { BlogPost, BlogCategory, getPosts, getCategories, adaptPost } from "@/ap
 import { getHomeContent, updateHomeContent } from "@/api/cms_home";
 import { getFaqs, getFaqCategories, massSaveFaqs } from "@/api/faq";
 
-// Mocks imports
+// CMS API imports
+import { getAboutCMS, updateAboutCMS } from "@/api/about";
+import { getOffersPageConfig, updateOffersPageConfig } from "@/api/offers";
+import { getContactCMS, updateContactCMS } from "@/api/contact_cms";
+import { getSearchCMS, updateSearchCMS } from "@/api/search_cms";
+import { getSettings, updateSettings } from "@/api/settings";
+
+import { 
+  AboutHeroData, AboutStoryData, AboutMission, AboutValue, AboutTimelineEvent, AboutTeamMember, AboutAward,
+  OffersHeroData, SeasonalOffer, FlashDeal, HowToRedeemStep, OffersNotifyData,
+  ContactHeroData, ContactMethod, ContactFormConfig, ContactMapConfig, ContactWorkingHours, ContactSocialLink, ContactCtaBanner, ContactFaqTeaser,
+  SearchHeroData, PopularSearch, QuickLink, SearchCTAData, SearchResultsConfig,
+  ClinicInfo, WorkingHours, SocialMedia, EmergencyContact,
+  defaultAboutHero, defaultAboutStory, defaultOffersHero, defaultOffersNotify, defaultContactHero, defaultContactForm, defaultContactMap, defaultContactCta, defaultContactFaq, defaultSearchHero, defaultSearchCTA, defaultSearchResultsConfig, defaultClinicInfo, defaultWorkingHours, defaultSocialMedia, defaultEmergencyContact
+} from "@/types/cms";
+
+// Legacy Mocks imports for types
 import { PackageCategory } from "@/mocks/packagesData";
-import { faqs as initialFaqs, faqCategories as initialCategories, type FAQItem, type FAQCategory } from "@/mocks/faqData";
-import { aboutHero, aboutStory, aboutMission, aboutValues, aboutTimeline, aboutTeam, aboutAwards } from "@/mocks/aboutData";
-import { contactHero, contactMethods, contactFormConfig, contactMapConfig, contactWorkingHours, contactSocialLinks, contactCtaBanner, contactFaqTeaser } from "@/mocks/contactData";
-import { offersHeroData, seasonalOffersData, flashDealsData, howToRedeemSteps, offersNotifyData } from "@/mocks/offersData";
-import { clinicInfo as initialClinicInfo, workingHours as initialWorkingHours, socialMedia as initialSocialMedia, emergencyContact as initialEmergencyContact } from "@/mocks/clinicSettings";
+export type { PackageCategory };
+import { type FAQItem, type FAQCategory } from "@/mocks/faqData";
 import { testimonialsData as initialTestimonials, testimonialsConfig as initialTestimonialsConfig, testimonialsStats as initialTestimonialsStats } from "@/mocks/testimonialsData";
-import { searchHeroData, popularSearchesData, quickLinksData, searchCTAData, searchResultsConfig as initialSearchResultsConfig } from "@/mocks/searchPageData";
 import { cmsContent as initialCmsContent, type CMSContent } from "@/mocks/cmsData";
 
-// ─── Interfaces ───────────────────────────────────────────────────────────────
-
+// --- Types ---
 export interface Doctor {
   id: string;
-  doctor_id?: string;
+  doctor_id: string;
   name: string;
   specialty: string;
   experience: string;
@@ -43,12 +54,13 @@ export interface Doctor {
 
 export interface ServiceDetail {
   id: string;
-  service_id?: string;
+  service_id: string;
   name: string;
   tagline: string;
   description: string;
   longDescription: string;
   icon: string;
+  color: string;
   accentColor: string;
   image: string;
   heroImage: string;
@@ -59,54 +71,54 @@ export interface ServiceDetail {
   doctors: any[];
   faqs: any[];
   relatedServices: string[];
-  color?: string;
-  price?: string;
-  duration?: string;
-  status?: "active" | "inactive";
+  price: string;
+  duration: string;
+  status: string;
 }
 
 export interface MedicalPackage {
   id: string;
-  package_id?: string;
+  package_id: string;
   name: string;
   category: PackageCategory;
   price: number;
-  originalPrice?: number;
-  badge?: string;
+  originalPrice: number;
+  badge: string;
   icon: string;
-  features: any[];
+  features: string[];
   accentColor: string;
-  description?: string;
-  duration?: string;
-  targetAudience?: string;
-  preparation?: string[];
-  includes?: any[];
-  faqs?: any[];
-  status?: "active" | "inactive";
-  image?: string;
+  description: string;
+  duration: string;
+  targetAudience: string;
+  preparation: string[];
+  includes: { label: string; icon: string }[];
+  faqs: any[];
+  status: string;
+  image: string;
 }
 
-// LocalStorage helpers
-function readLS<T>(key: string, fallback: T): T {
+// ----------------------------------------------------------------------
+// LocalStorage helpers for legacy stuff like testimonials
+// ----------------------------------------------------------------------
+function readLS<T>(key: string, defaultVal: T): T {
   try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultVal;
   } catch {
-    return fallback;
+    return defaultVal;
   }
 }
-
-function writeLS<T>(key: string, value: T): void {
+function writeLS<T>(key: string, value: T) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch { /* silent */ }
 }
 
-// ─── Context Interface ──────────────────────────────────────────────────────────
+// ----------------------------------------------------------------------
+// Context Interface
+// ----------------------------------------------------------------------
 
 interface DataContextType {
-  // API Entities
   doctors: Doctor[];
   doctorsLoading: boolean;
   doctorsError: string | null;
@@ -129,7 +141,6 @@ interface DataContextType {
   blogError: string | null;
   reloadBlog: () => Promise<void>;
 
-  // LocalStorage Entities
   // FAQs
   faqs: FAQItem[];
   faqCategories: FAQCategory[];
@@ -139,73 +150,77 @@ interface DataContextType {
   saveFAQs: (newFaqs: FAQItem[], newCats: FAQCategory[]) => Promise<void>;
   resetFAQs: () => void;
 
-  // About
-  aboutHero: typeof aboutHero;
-  aboutStory: typeof aboutStory;
-  aboutMission: typeof aboutMission;
-  aboutValues: typeof aboutValues;
-  aboutTimeline: typeof aboutTimeline;
-  aboutTeam: typeof aboutTeam;
-  aboutAwards: typeof aboutAwards;
+  // About CMS
+  aboutHero: AboutHeroData;
+  aboutStory: AboutStoryData;
+  aboutMission: AboutMission[];
+  aboutValues: AboutValue[];
+  aboutTimeline: AboutTimelineEvent[];
+  aboutTeam: AboutTeamMember[];
+  aboutAwards: AboutAward[];
+  aboutLoading: boolean;
+  reloadAbout: () => Promise<void>;
   saveAbout: (data: {
-    hero: typeof aboutHero;
-    story: typeof aboutStory;
-    mission: typeof aboutMission;
-    values: typeof aboutValues;
-    timeline: typeof aboutTimeline;
-    team: typeof aboutTeam;
-    awards: typeof aboutAwards;
+    hero: AboutHeroData;
+    story: AboutStoryData;
+    mission: AboutMission[];
+    values: AboutValue[];
+    timeline: AboutTimelineEvent[];
+    team: AboutTeamMember[];
+    awards: AboutAward[];
   }) => Promise<void>;
-  resetAbout: () => void;
 
-  // Contact
-  contactHero: typeof contactHero;
-  contactMethods: typeof contactMethods;
-  contactFormConfig: typeof contactFormConfig;
-  contactMapConfig: typeof contactMapConfig;
-  contactWorkingHours: typeof contactWorkingHours;
-  contactSocialLinks: typeof contactSocialLinks;
-  contactCtaBanner: typeof contactCtaBanner;
-  contactFaqTeaser: typeof contactFaqTeaser;
+  // Contact CMS
+  contactHero: ContactHeroData;
+  contactMethods: ContactMethod[];
+  contactFormConfig: ContactFormConfig;
+  contactMapConfig: ContactMapConfig;
+  contactWorkingHours: ContactWorkingHours;
+  contactSocialLinks: ContactSocialLink[];
+  contactCtaBanner: ContactCtaBanner;
+  contactFaqTeaser: ContactFaqTeaser;
+  contactLoading: boolean;
+  reloadContact: () => Promise<void>;
   saveContact: (data: {
-    hero: typeof contactHero;
-    methods: typeof contactMethods;
-    form: typeof contactFormConfig;
-    map: typeof contactMapConfig;
-    hours: typeof contactWorkingHours;
-    social: typeof contactSocialLinks;
-    cta: typeof contactCtaBanner;
-    faq: typeof contactFaqTeaser;
+    hero: ContactHeroData;
+    methods: ContactMethod[];
+    form: ContactFormConfig;
+    map: ContactMapConfig;
+    hours: ContactWorkingHours;
+    social: ContactSocialLink[];
+    cta: ContactCtaBanner;
+    faq: ContactFaqTeaser;
   }) => Promise<void>;
-  resetContact: () => void;
 
-  // Offers
-  offersHero: typeof offersHeroData;
-  offersSeasonal: typeof seasonalOffersData;
-  offersFlash: typeof flashDealsData;
-  offersRedeem: typeof howToRedeemSteps;
-  offersNotify: typeof offersNotifyData;
+  // Offers CMS
+  offersHero: OffersHeroData;
+  offersSeasonal: SeasonalOffer[];
+  offersFlash: FlashDeal[];
+  offersRedeem: HowToRedeemStep[];
+  offersNotify: OffersNotifyData;
+  offersLoading: boolean;
+  reloadOffers: () => Promise<void>;
   saveOffers: (data: {
-    hero: typeof offersHeroData;
-    seasonal: typeof seasonalOffersData;
-    flash: typeof flashDealsData;
-    redeem: typeof howToRedeemSteps;
-    notify: typeof offersNotifyData;
+    hero: OffersHeroData;
+    seasonal: SeasonalOffer[];
+    flash: FlashDeal[];
+    redeem: HowToRedeemStep[];
+    notify: OffersNotifyData;
   }) => Promise<void>;
-  resetOffers: () => void;
 
-  // Clinic Settings
-  clinicInfo: typeof initialClinicInfo;
-  clinicHours: typeof initialWorkingHours;
-  clinicSocial: typeof initialSocialMedia;
-  clinicEmergency: typeof initialEmergencyContact;
+  // Settings CMS
+  clinicInfo: ClinicInfo;
+  clinicHours: WorkingHours;
+  clinicSocial: SocialMedia;
+  clinicEmergency: EmergencyContact;
+  settingsLoading: boolean;
+  reloadSettings: () => Promise<void>;
   saveSettings: (data: {
-    info: typeof initialClinicInfo;
-    hours: typeof initialWorkingHours;
-    social: typeof initialSocialMedia;
-    emergency: typeof initialEmergencyContact;
+    info: ClinicInfo;
+    hours: WorkingHours;
+    social: SocialMedia;
+    emergency: EmergencyContact;
   }) => Promise<void>;
-  resetSettings: () => void;
 
   // Testimonials
   testimonials: typeof initialTestimonials;
@@ -214,22 +229,23 @@ interface DataContextType {
   saveTestimonials: (data: typeof initialTestimonials, config: typeof initialTestimonialsConfig) => Promise<void>;
   resetTestimonials: () => void;
 
-  // Search
-  searchHero: typeof searchHeroData;
-  searchPopular: typeof popularSearchesData;
-  searchQuickLinks: typeof quickLinksData;
-  searchCTA: typeof searchCTAData;
-  searchResultsConfig: typeof initialSearchResultsConfig;
+  // Search CMS
+  searchHero: SearchHeroData;
+  searchPopular: PopularSearch[];
+  searchQuickLinks: QuickLink[];
+  searchCTA: SearchCTAData;
+  searchResultsConfig: SearchResultsConfig;
+  searchLoading: boolean;
+  reloadSearch: () => Promise<void>;
   saveSearch: (data: {
-    hero: typeof searchHeroData;
-    popular: typeof popularSearchesData;
-    quickLinks: typeof quickLinksData;
-    cta: typeof searchCTAData;
-    resultsConfig: typeof initialSearchResultsConfig;
+    hero: SearchHeroData;
+    popular: PopularSearch[];
+    quickLinks: QuickLink[];
+    cta: SearchCTAData;
+    resultsConfig: SearchResultsConfig;
   }) => Promise<void>;
-  resetSearch: () => void;
 
-  // Homepage CMS Content
+  // Homepage CMS
   homeContent: CMSContent;
   saveHomeContent: (data: CMSContent) => Promise<void>;
   resetHomeContent: () => void;
@@ -238,7 +254,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // ─── API State ──────────────────────────────────────────────────────────────
+  // API State
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [doctorsLoading, setDoctorsLoading] = useState(true);
   const [doctorsError, setDoctorsError] = useState<string | null>(null);
@@ -256,61 +272,64 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [blogLoading, setBlogLoading] = useState(true);
   const [blogError, setBlogError] = useState<string | null>(null);
 
-  // ─── LocalStorage State ──────────────────────────────────────────────────────
   // FAQs
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [faqCategories, setFaqCategories] = useState<FAQCategory[]>([]);
   const [faqsLoading, setFaqsLoading] = useState(true);
   const [faqsError, setFaqsError] = useState<string | null>(null);
 
-  // About
-  const [aboutHeroState, setAboutHero] = useState(() => readLS("about_hero", aboutHero));
-  const [aboutStoryState, setAboutStory] = useState(() => readLS("about_story", aboutStory));
-  const [aboutMissionState, setAboutMission] = useState(() => readLS("about_mission", aboutMission));
-  const [aboutValuesState, setAboutValues] = useState(() => readLS("about_values", aboutValues));
-  const [aboutTimelineState, setAboutTimeline] = useState(() => readLS("about_timeline", aboutTimeline));
-  const [aboutTeamState, setAboutTeam] = useState(() => readLS("about_team", aboutTeam));
-  const [aboutAwardsState, setAboutAwards] = useState(() => readLS("about_awards", aboutAwards));
+  // About CMS State
+  const [aboutLoading, setAboutLoading] = useState(true);
+  const [aboutHeroState, setAboutHero] = useState<AboutHeroData>(defaultAboutHero);
+  const [aboutStoryState, setAboutStory] = useState<AboutStoryData>(defaultAboutStory);
+  const [aboutMissionState, setAboutMission] = useState<AboutMission[]>([]);
+  const [aboutValuesState, setAboutValues] = useState<AboutValue[]>([]);
+  const [aboutTimelineState, setAboutTimeline] = useState<AboutTimelineEvent[]>([]);
+  const [aboutTeamState, setAboutTeam] = useState<AboutTeamMember[]>([]);
+  const [aboutAwardsState, setAboutAwards] = useState<AboutAward[]>([]);
 
-  // Contact
-  const [contactHeroState, setContactHero] = useState(() => readLS("contact_hero", contactHero));
-  const [contactMethodsState, setContactMethods] = useState(() => readLS("contact_methods", contactMethods));
-  const [contactFormConfigState, setContactFormConfig] = useState(() => readLS("contact_form", contactFormConfig));
-  const [contactMapConfigState, setContactMapConfig] = useState(() => readLS("contact_map", contactMapConfig));
-  const [contactWorkingHoursState, setContactWorkingHours] = useState(() => readLS("contact_hours", contactWorkingHours));
-  const [contactSocialLinksState, setContactSocialLinks] = useState(() => readLS("contact_social", contactSocialLinks));
-  const [contactCtaBannerState, setContactCtaBanner] = useState(() => readLS("contact_cta", contactCtaBanner));
-  const [contactFaqTeaserState, setContactFaqTeaser] = useState(() => readLS("contact_faq", contactFaqTeaser));
+  // Contact CMS State
+  const [contactLoading, setContactLoading] = useState(true);
+  const [contactHeroState, setContactHero] = useState<ContactHeroData>(defaultContactHero);
+  const [contactMethodsState, setContactMethods] = useState<ContactMethod[]>([]);
+  const [contactFormConfigState, setContactFormConfig] = useState<ContactFormConfig>(defaultContactForm);
+  const [contactMapConfigState, setContactMapConfig] = useState<ContactMapConfig>(defaultContactMap);
+  const [contactWorkingHoursState, setContactWorkingHours] = useState<ContactWorkingHours>([]);
+  const [contactSocialLinksState, setContactSocialLinks] = useState<ContactSocialLink[]>([]);
+  const [contactCtaBannerState, setContactCtaBanner] = useState<ContactCtaBanner>(defaultContactCta);
+  const [contactFaqTeaserState, setContactFaqTeaser] = useState<ContactFaqTeaser>(defaultContactFaq);
 
-  // Offers
-  const [offersHeroState, setOffersHero] = useState(() => readLS("offers_hero", offersHeroData));
-  const [offersSeasonalState, setOffersSeasonal] = useState(() => readLS("offers_seasonal", seasonalOffersData));
-  const [offersFlashState, setOffersFlash] = useState(() => readLS("offers_flash", flashDealsData));
-  const [offersRedeemState, setOffersRedeem] = useState(() => readLS("offers_redeem", howToRedeemSteps));
-  const [offersNotifyState, setOffersNotify] = useState(() => readLS("offers_notify", offersNotifyData));
+  // Offers CMS State
+  const [offersLoading, setOffersLoading] = useState(true);
+  const [offersHeroState, setOffersHero] = useState<OffersHeroData>(defaultOffersHero);
+  const [offersSeasonalState, setOffersSeasonal] = useState<SeasonalOffer[]>([]);
+  const [offersFlashState, setOffersFlash] = useState<FlashDeal[]>([]);
+  const [offersRedeemState, setOffersRedeem] = useState<HowToRedeemStep[]>([]);
+  const [offersNotifyState, setOffersNotify] = useState<OffersNotifyData>(defaultOffersNotify);
 
-  // Clinic Settings
-  const [clinicInfoState, setClinicInfo] = useState(() => readLS("cms_settings_info", initialClinicInfo));
-  const [clinicHoursState, setClinicHours] = useState(() => readLS("cms_settings_hours", initialWorkingHours));
-  const [clinicSocialState, setClinicSocial] = useState(() => readLS("cms_settings_social", initialSocialMedia));
-  const [clinicEmergencyState, setClinicEmergency] = useState(() => readLS("cms_settings_emergency", initialEmergencyContact));
+  // Clinic Settings State
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [clinicInfoState, setClinicInfo] = useState<ClinicInfo>(defaultClinicInfo);
+  const [clinicHoursState, setClinicHours] = useState<WorkingHours>(defaultWorkingHours);
+  const [clinicSocialState, setClinicSocial] = useState<SocialMedia>(defaultSocialMedia);
+  const [clinicEmergencyState, setClinicEmergency] = useState<EmergencyContact>(defaultEmergencyContact);
 
   // Testimonials
-  const [testimonialsState, setTestimonials] = useState(() => readLS("testimonials", initialTestimonials));
-  const [testimonialsConfigState, setTestimonialsConfig] = useState(() => readLS("testimonialsConfig", initialTestimonialsConfig));
+  const [testimonialsState, setTestimonials] = useState<any[]>(initialTestimonials);
+  const [testimonialsConfigState, setTestimonialsConfig] = useState<any>(initialTestimonialsConfig);
 
-  // Search
-  const [searchHeroState, setSearchHero] = useState(() => readLS("search_hero", searchHeroData));
-  const [searchPopularState, setSearchPopular] = useState(() => readLS("search_popular", popularSearchesData));
-  const [searchQuickLinksState, setSearchQuickLinks] = useState(() => readLS("search_quicklinks", quickLinksData));
-  const [searchCTAState, setSearchCTA] = useState(() => readLS("search_cta", searchCTAData));
-  const [searchResultsConfigState, setSearchResultsConfig] = useState(() => readLS("search_results_config", initialSearchResultsConfig));
+  // Search CMS State
+  const [searchLoading, setSearchLoading] = useState(true);
+  const [searchHeroState, setSearchHero] = useState<SearchHeroData>(defaultSearchHero);
+  const [searchPopularState, setSearchPopular] = useState<PopularSearch[]>([]);
+  const [searchQuickLinksState, setSearchQuickLinks] = useState<QuickLink[]>([]);
+  const [searchCTAState, setSearchCTA] = useState<SearchCTAData>(defaultSearchCTA);
+  const [searchResultsConfigState, setSearchResultsConfig] = useState<SearchResultsConfig>(defaultSearchResultsConfig);
 
   // Home Page CMS
   const [homeContentState, setHomeContent] = useState<CMSContent>(() => readLS("cms_home_data", initialCmsContent));
 
-  // ─── API Loaders ─────────────────────────────────────────────────────────────
-
+  // --- Loaders ---
   const reloadDoctors = useCallback(async () => {
     setDoctorsLoading(true);
     setDoctorsError(null);
@@ -447,16 +466,44 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await getHomeContent();
       if (data && data.hero && data.whyUs) {
         setHomeContent(data);
+        if (data.testimonials) {
+          const rawItems = Array.isArray(data.testimonials.items) 
+            ? data.testimonials.items 
+            : (Array.isArray(data.testimonials) ? data.testimonials : []);
+          
+          const mapped = rawItems.map((t: any, idx: number) => ({
+            id: t.id || `t-${idx}`,
+            name: t.name || "",
+            specialty: t.specialty || t.role || "",
+            text: t.text || "",
+            rating: t.rating || 5,
+            image: t.image || t.avatar || "",
+            date: t.date || "",
+            service: t.service || "",
+            verified: t.verified ?? true,
+            published: t.published ?? true,
+            featured: t.featured ?? true,
+          }));
+          setTestimonials(mapped);
+
+          const cfg = {
+            sectionBadge: data.testimonials.badge || data.testimonials.config?.sectionBadge || "تجارب مرضانا",
+            sectionTitle: data.testimonials.heading || data.testimonials.config?.sectionTitle || "ماذا يقول من اختاروا الفهم الحقيقي؟",
+            sectionSubtitle: data.testimonials.description || data.testimonials.config?.sectionSubtitle || "مرضى لم تمنحهم الزيارات السريعة صورة واضحة — حتى جاؤوا إلى ذا مديكال أفينيو",
+            displayStyle: data.testimonials.config?.displayStyle || "slider",
+            showRating: data.testimonials.config?.showRating ?? true,
+            showImage: data.testimonials.config?.showImage ?? true,
+          };
+          setTestimonialsConfig(cfg);
+        }
       }
     } catch (err) {
-      console.error("Failed to load CMS home content from API, using default/localStorage:", err);
-      setHomeContent(readLS("cms_home_data", initialCmsContent));
+      console.error("Failed to load CMS home content from API", err);
     }
   }, []);
 
   const reloadFAQs = useCallback(async () => {
     setFaqsLoading(true);
-    setFaqsError(null);
     try {
       const [fetchedFaqs, fetchedCategories] = await Promise.all([
         getFaqs(),
@@ -465,16 +512,92 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setFaqs(fetchedFaqs);
       setFaqCategories(fetchedCategories);
     } catch (err) {
-      setFaqsError(err instanceof Error ? err.message : "فشل في تحميل الأسئلة الشائعة");
-      // Fallback
-      setFaqs(readLS("cms_faq_items", initialFaqs));
-      setFaqCategories(readLS("cms_faq_categories", initialCategories));
+      console.error(err);
     } finally {
       setFaqsLoading(false);
     }
   }, []);
 
-  // Load all API entities on mount
+  const reloadAbout = useCallback(async () => {
+    setAboutLoading(true);
+    try {
+      const data = await getAboutCMS();
+      setAboutHero(data.hero || defaultAboutHero);
+      setAboutStory(data.story || defaultAboutStory);
+      setAboutMission(data.mission || []);
+      setAboutValues(data.values || []);
+      setAboutTimeline(data.timeline || []);
+      setAboutTeam(data.team || []);
+      setAboutAwards(data.awards || []);
+    } catch (err) {
+      console.error("Failed to fetch About CMS", err);
+    } finally {
+      setAboutLoading(false);
+    }
+  }, []);
+
+  const reloadContact = useCallback(async () => {
+    setContactLoading(true);
+    try {
+      const data = await getContactCMS();
+      setContactHero(data.hero || defaultContactHero);
+      setContactMethods(data.methods || []);
+      setContactFormConfig(data.form_config || defaultContactForm);
+      setContactMapConfig(data.map_config || defaultContactMap);
+      setContactCtaBanner(data.cta_banner || defaultContactCta);
+      setContactFaqTeaser(data.faq_teaser || defaultContactFaq);
+    } catch (err) {
+      console.error("Failed to fetch Contact CMS", err);
+    } finally {
+      setContactLoading(false);
+    }
+  }, []);
+
+  const reloadSearch = useCallback(async () => {
+    setSearchLoading(true);
+    try {
+      const data = await getSearchCMS();
+      setSearchHero(data.hero || defaultSearchHero);
+      setSearchPopular(data.popular_searches || []);
+      setSearchQuickLinks(data.quick_links || []);
+      setSearchCTA(data.cta || defaultSearchCTA);
+      setSearchResultsConfig(data.results_config || defaultSearchResultsConfig);
+    } catch (err) {
+      console.error("Failed to fetch Search CMS", err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
+  const reloadOffers = useCallback(async () => {
+    setOffersLoading(true);
+    try {
+      const data = await getOffersPageConfig();
+      setOffersHero(data.hero || defaultOffersHero);
+      setOffersRedeem(data.how_to_redeem || []);
+      setOffersNotify(data.notify || defaultOffersNotify);
+    } catch (err) {
+      console.error("Failed to fetch Offers CMS", err);
+    } finally {
+      setOffersLoading(false);
+    }
+  }, []);
+
+  const reloadSettings = useCallback(async () => {
+    setSettingsLoading(true);
+    try {
+      const data = await getSettings();
+      setClinicInfo(data.clinic_info || defaultClinicInfo);
+      setClinicHours(data.working_hours || defaultWorkingHours);
+      setClinicSocial(data.social_media || defaultSocialMedia);
+      setClinicEmergency(data.emergency_contact || defaultEmergencyContact);
+    } catch (err) {
+      console.error("Failed to fetch Settings CMS", err);
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     reloadDoctors();
     reloadServices();
@@ -482,390 +605,160 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     reloadBlog();
     reloadHomeContent();
     reloadFAQs();
-  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, reloadFAQs]);
+    reloadAbout();
+    reloadContact();
+    reloadSearch();
+    reloadOffers();
+    reloadSettings();
+  }, [
+    reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, 
+    reloadFAQs, reloadAbout, reloadContact, reloadSearch, reloadOffers, reloadSettings
+  ]);
 
-  // Listen to cross-component updates via CustomEvents
+  // Listen to custom updates
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       const key = detail?.key;
       if (!key) return;
 
-      // Reload appropriate sections
       if (key === "doctors") reloadDoctors();
       if (key === "services") reloadServices();
       if (key === "packages") reloadPackages();
       if (key === "blog") reloadBlog();
       if (key === "faqs") reloadFAQs();
-
-      // local storage syncing
-      if (key === "cms_faq_items") setFaqs(readLS("cms_faq_items", initialFaqs));
-      if (key === "cms_faq_categories") setFaqCategories(readLS("cms_faq_categories", initialCategories));
-      if (key === "about_hero") setAboutHero(readLS("about_hero", aboutHero));
-      if (key === "about_story") setAboutStory(readLS("about_story", aboutStory));
-      if (key === "about_mission") setAboutMission(readLS("about_mission", aboutMission));
-      if (key === "about_values") setAboutValues(readLS("about_values", aboutValues));
-      if (key === "about_timeline") setAboutTimeline(readLS("about_timeline", aboutTimeline));
-      if (key === "about_team") setAboutTeam(readLS("about_team", aboutTeam));
-      if (key === "about_awards") setAboutAwards(readLS("about_awards", aboutAwards));
-      if (key === "contact_hero") setContactHero(readLS("contact_hero", contactHero));
-      if (key === "contact_methods") setContactMethods(readLS("contact_methods", contactMethods));
-      if (key === "contact_form") setContactFormConfig(readLS("contact_form", contactFormConfig));
-      if (key === "contact_map") setContactMapConfig(readLS("contact_map", contactMapConfig));
-      if (key === "contact_hours") setContactWorkingHours(readLS("contact_hours", contactWorkingHours));
-      if (key === "contact_social") setContactSocialLinks(readLS("contact_social", contactSocialLinks));
-      if (key === "contact_cta") setContactCtaBanner(readLS("contact_cta", contactCtaBanner));
-      if (key === "contact_faq") setContactFaqTeaser(readLS("contact_faq", contactFaqTeaser));
-      if (key === "offers_hero") setOffersHero(readLS("offers_hero", offersHeroData));
-      if (key === "offers_seasonal") setOffersSeasonal(readLS("offers_seasonal", seasonalOffersData));
-      if (key === "offers_flash") setOffersFlash(readLS("offers_flash", flashDealsData));
-      if (key === "offers_redeem") setOffersRedeem(readLS("offers_redeem", howToRedeemSteps));
-      if (key === "offers_notify") setOffersNotify(readLS("offers_notify", offersNotifyData));
-      if (key === "cms_settings_info") setClinicInfo(readLS("cms_settings_info", initialClinicInfo));
-      if (key === "cms_settings_hours") setClinicHours(readLS("cms_settings_hours", initialWorkingHours));
-      if (key === "cms_settings_social") setClinicSocial(readLS("cms_settings_social", initialSocialMedia));
-      if (key === "cms_settings_emergency") setClinicEmergency(readLS("cms_settings_emergency", initialEmergencyContact));
-      if (key === "testimonials") setTestimonials(readLS("testimonials", initialTestimonials));
-      if (key === "testimonialsConfig") setTestimonialsConfig(readLS("testimonialsConfig", initialTestimonialsConfig));
-      if (key === "search_hero") setSearchHero(readLS("search_hero", searchHeroData));
-      if (key === "search_popular") setSearchPopular(readLS("search_popular", popularSearchesData));
-      if (key === "search_quicklinks") setSearchQuickLinks(readLS("search_quicklinks", quickLinksData));
-      if (key === "search_cta") setSearchCTA(readLS("search_cta", searchCTAData));
-      if (key === "search_results_config") setSearchResultsConfig(readLS("search_results_config", initialSearchResultsConfig));
       if (key === "cms_home_data" || key === "home") reloadHomeContent();
+      
+      // We can map keys to reloads or just reload everything
+      if (key.startsWith("about_")) reloadAbout();
+      if (key.startsWith("contact_")) reloadContact();
+      if (key.startsWith("search_")) reloadSearch();
+      if (key.startsWith("offers_")) reloadOffers();
+      if (key.startsWith("cms_settings_")) reloadSettings();
     };
-
     window.addEventListener("cms-update", handler);
     return () => window.removeEventListener("cms-update", handler);
-  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, reloadFAQs]);
+  }, [reloadDoctors, reloadServices, reloadPackages, reloadBlog, reloadHomeContent, reloadFAQs, reloadAbout, reloadContact, reloadSearch, reloadOffers, reloadSettings]);
 
-  // ─── LocalStorage Savers & Resetters ──────────────────────────────────────────
 
-  // FAQs
+  // --- Savers ---
   const saveFAQs = async (newFaqs: FAQItem[], newCats: FAQCategory[]) => {
-    try {
-      await massSaveFaqs(newFaqs, faqs, newCats, faqCategories);
-      await reloadFAQs();
-      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "faqs" } }));
-    } catch (err) {
-      console.error("Failed to mass save FAQs:", err);
-      writeLS("cms_faq_items", newFaqs);
-      writeLS("cms_faq_categories", newCats);
-      setFaqs(newFaqs);
-      setFaqCategories(newCats);
-      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_items" } }));
-      window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_faq_categories" } }));
-      throw err;
-    }
+    await massSaveFaqs(newFaqs, faqs, newCats, faqCategories);
+    await reloadFAQs();
+    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "faqs" } }));
   };
+  const resetFAQs = () => {};
 
-  const resetFAQs = () => {
-    saveFAQs(initialFaqs, initialCategories);
-  };
-
-  // About
-  const saveAbout = async (data: {
-    hero: typeof aboutHero;
-    story: typeof aboutStory;
-    mission: typeof aboutMission;
-    values: typeof aboutValues;
-    timeline: typeof aboutTimeline;
-    team: typeof aboutTeam;
-    awards: typeof aboutAwards;
-  }) => {
-    writeLS("about_hero", data.hero);
-    writeLS("about_story", data.story);
-    writeLS("about_mission", data.mission);
-    writeLS("about_values", data.values);
-    writeLS("about_timeline", data.timeline);
-    writeLS("about_team", data.team);
-    writeLS("about_awards", data.awards);
-
-    setAboutHero(data.hero);
-    setAboutStory(data.story);
-    setAboutMission(data.mission);
-    setAboutValues(data.values);
-    setAboutTimeline(data.timeline);
-    setAboutTeam(data.team);
-    setAboutAwards(data.awards);
-
+  const saveAbout = async (data: any) => {
+    const token = localStorage.getItem("access_token") || "";
+    await updateAboutCMS(data, token);
+    await reloadAbout();
     window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "about_hero" } }));
   };
 
-  const resetAbout = () => {
-    saveAbout({
-      hero: aboutHero,
-      story: aboutStory,
-      mission: aboutMission,
-      values: aboutValues,
-      timeline: aboutTimeline,
-      team: aboutTeam,
-      awards: aboutAwards
-    });
-  };
-
-  // Contact
-  const saveContact = async (data: {
-    hero: typeof contactHero;
-    methods: typeof contactMethods;
-    form: typeof contactFormConfig;
-    map: typeof contactMapConfig;
-    hours: typeof contactWorkingHours;
-    social: typeof contactSocialLinks;
-    cta: typeof contactCtaBanner;
-    faq: typeof contactFaqTeaser;
-  }) => {
-    writeLS("contact_hero", data.hero);
-    writeLS("contact_methods", data.methods);
-    writeLS("contact_form", data.form);
-    writeLS("contact_map", data.map);
-    writeLS("contact_hours", data.hours);
-    writeLS("contact_social", data.social);
-    writeLS("contact_cta", data.cta);
-    writeLS("contact_faq", data.faq);
-
-    setContactHero(data.hero);
-    setContactMethods(data.methods);
-    setContactFormConfig(data.form);
-    setContactMapConfig(data.map);
-    setContactWorkingHours(data.hours);
-    setContactSocialLinks(data.social);
-    setContactCtaBanner(data.cta);
-    setContactFaqTeaser(data.faq);
-
+  const saveContact = async (data: any) => {
+    const token = localStorage.getItem("access_token") || "";
+    await updateContactCMS({
+      hero: data.hero,
+      methods: data.methods,
+      form_config: data.form,
+      map_config: data.map,
+      cta_banner: data.cta,
+      faq_teaser: data.faq
+    }, token);
+    await reloadContact();
     window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "contact_hero" } }));
   };
 
-  const resetContact = () => {
-    saveContact({
-      hero: contactHero,
-      methods: contactMethods,
-      form: contactFormConfig,
-      map: contactMapConfig,
-      hours: contactWorkingHours,
-      social: contactSocialLinks,
-      cta: contactCtaBanner,
-      faq: contactFaqTeaser
-    });
-  };
-
-  // Offers
-  const saveOffers = async (data: {
-    hero: typeof offersHeroData;
-    seasonal: typeof seasonalOffersData;
-    flash: typeof flashDealsData;
-    redeem: typeof howToRedeemSteps;
-    notify: typeof offersNotifyData;
-  }) => {
-    writeLS("offers_hero", data.hero);
-    writeLS("offers_seasonal", data.seasonal);
-    writeLS("offers_flash", data.flash);
-    writeLS("offers_redeem", data.redeem);
-    writeLS("offers_notify", data.notify);
-
-    setOffersHero(data.hero);
-    setOffersSeasonal(data.seasonal);
-    setOffersFlash(data.flash);
-    setOffersRedeem(data.redeem);
-    setOffersNotify(data.notify);
-
-    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "offers_hero" } }));
-  };
-
-  const resetOffers = () => {
-    saveOffers({
-      hero: offersHeroData,
-      seasonal: seasonalOffersData,
-      flash: flashDealsData,
-      redeem: howToRedeemSteps,
-      notify: offersNotifyData
-    });
-  };
-
-  // Settings
-  const saveSettings = async (data: {
-    info: typeof initialClinicInfo;
-    hours: typeof initialWorkingHours;
-    social: typeof initialSocialMedia;
-    emergency: typeof initialEmergencyContact;
-  }) => {
-    writeLS("cms_settings_info", data.info);
-    writeLS("cms_settings_hours", data.hours);
-    writeLS("cms_settings_social", data.social);
-    writeLS("cms_settings_emergency", data.emergency);
-
-    setClinicInfo(data.info);
-    setClinicHours(data.hours);
-    setClinicSocial(data.social);
-    setClinicEmergency(data.emergency);
-
-    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_settings_info" } }));
-  };
-
-  const resetSettings = () => {
-    saveSettings({
-      info: initialClinicInfo,
-      hours: initialWorkingHours,
-      social: initialSocialMedia,
-      emergency: initialEmergencyContact
-    });
-  };
-
-  // Testimonials
-  const saveTestimonials = async (data: typeof initialTestimonials, config: typeof initialTestimonialsConfig) => {
-    writeLS("testimonials", data);
-    writeLS("testimonialsConfig", config);
-
-    setTestimonials(data);
-    setTestimonialsConfig(config);
-
-    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "testimonials" } }));
-  };
-
-  const resetTestimonials = () => {
-    saveTestimonials(initialTestimonials, initialTestimonialsConfig);
-  };
-
-  // Search
-  const saveSearch = async (data: {
-    hero: typeof searchHeroData;
-    popular: typeof popularSearchesData;
-    quickLinks: typeof quickLinksData;
-    cta: typeof searchCTAData;
-    resultsConfig: typeof initialSearchResultsConfig;
-  }) => {
-    writeLS("search_hero", data.hero);
-    writeLS("search_popular", data.popular);
-    writeLS("search_quicklinks", data.quickLinks);
-    writeLS("search_cta", data.cta);
-    writeLS("search_results_config", data.resultsConfig);
-
-    setSearchHero(data.hero);
-    setSearchPopular(data.popular);
-    setSearchQuickLinks(data.quickLinks);
-    setSearchCTA(data.cta);
-    setSearchResultsConfig(data.resultsConfig);
-
+  const saveSearch = async (data: any) => {
+    const token = localStorage.getItem("access_token") || "";
+    await updateSearchCMS({
+      hero: data.hero,
+      popular_searches: data.popular,
+      quick_links: data.quickLinks,
+      cta: data.cta,
+      results_config: data.resultsConfig
+    }, token);
+    await reloadSearch();
     window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "search_hero" } }));
   };
 
-  const resetSearch = () => {
-    saveSearch({
-      hero: searchHeroData,
-      popular: popularSearchesData,
-      quickLinks: quickLinksData,
-      cta: searchCTAData,
-      resultsConfig: initialSearchResultsConfig
-    });
+  const saveOffers = async (data: any) => {
+    const token = localStorage.getItem("access_token") || "";
+    await updateOffersPageConfig({
+      hero: data.hero,
+      how_to_redeem: data.redeem,
+      notify: data.notify
+    }, token);
+    await reloadOffers();
+    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "offers_hero" } }));
   };
 
-  // Home Page
-  const saveHomeContent = async (data: CMSContent) => {
-    try {
-      const updated = await updateHomeContent(data);
-      setHomeContent(updated);
-      writeLS("cms_home_data", updated);
-    } catch (err) {
-      console.error("Failed to save home content to API:", err);
-      writeLS("cms_home_data", data);
-      setHomeContent(data);
-      throw err;
-    }
+  const saveSettings = async (data: any) => {
+    const token = localStorage.getItem("access_token") || "";
+    await updateSettings({
+      clinic_info: data.info,
+      working_hours: data.hours,
+      social_media: data.social,
+      emergency_contact: data.emergency
+    }, token);
+    await reloadSettings();
+    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_settings_info" } }));
+  };
+
+  const saveTestimonials = async (data: any, config: any) => {
+    const updatedHomeContent = {
+      ...homeContentState,
+      testimonials: {
+        ...homeContentState.testimonials,
+        items: data,
+        config: config
+      }
+    };
+    const updated = await updateHomeContent(updatedHomeContent);
+    setHomeContent(updated);
+    setTestimonials(data);
+    setTestimonialsConfig(config);
     window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_home_data" } }));
   };
+  const resetTestimonials = () => {};
 
-  const resetHomeContent = () => {
-    saveHomeContent({ ...initialCmsContent });
+  const saveHomeContent = async (data: CMSContent) => {
+    const updated = await updateHomeContent(data);
+    setHomeContent(updated);
+    window.dispatchEvent(new CustomEvent("cms-update", { detail: { key: "cms_home_data" } }));
   };
+  const resetHomeContent = () => {};
 
   const posts = allPosts.filter(p => p.status === "published");
 
   return (
     <DataContext.Provider
       value={{
-        doctors,
-        doctorsLoading,
-        doctorsError,
-        reloadDoctors,
+        doctors, doctorsLoading, doctorsError, reloadDoctors,
+        services, servicesLoading, servicesError, reloadServices,
+        packages, packagesLoading, packagesError, reloadPackages,
+        posts, allPosts, blogCategories, blogLoading, blogError, reloadBlog,
+        faqs, faqCategories, faqsLoading, faqsError, reloadFAQs, saveFAQs, resetFAQs,
+        
+        aboutHero: aboutHeroState, aboutStory: aboutStoryState, aboutMission: aboutMissionState, aboutValues: aboutValuesState, aboutTimeline: aboutTimelineState, aboutTeam: aboutTeamState, aboutAwards: aboutAwardsState,
+        aboutLoading, reloadAbout, saveAbout,
 
-        services,
-        servicesLoading,
-        servicesError,
-        reloadServices,
+        contactHero: contactHeroState, contactMethods: contactMethodsState, contactFormConfig: contactFormConfigState, contactMapConfig: contactMapConfigState, contactWorkingHours: contactWorkingHoursState, contactSocialLinks: contactSocialLinksState, contactCtaBanner: contactCtaBannerState, contactFaqTeaser: contactFaqTeaserState,
+        contactLoading, reloadContact, saveContact,
 
-        packages,
-        packagesLoading,
-        packagesError,
-        reloadPackages,
+        offersHero: offersHeroState, offersSeasonal: offersSeasonalState, offersFlash: offersFlashState, offersRedeem: offersRedeemState, offersNotify: offersNotifyState,
+        offersLoading, reloadOffers, saveOffers,
 
-        posts,
-        allPosts,
-        blogCategories,
-        blogLoading,
-        blogError,
-        reloadBlog,
+        clinicInfo: clinicInfoState, clinicHours: clinicHoursState, clinicSocial: clinicSocialState, clinicEmergency: clinicEmergencyState,
+        settingsLoading, reloadSettings, saveSettings,
 
-        faqs,
-        faqCategories,
-        faqsLoading,
-        faqsError,
-        reloadFAQs,
-        saveFAQs,
-        resetFAQs,
+        testimonials: testimonialsState, testimonialsConfig: testimonialsConfigState, testimonialsStats: initialTestimonialsStats, saveTestimonials, resetTestimonials,
 
-        aboutHero: aboutHeroState,
-        aboutStory: aboutStoryState,
-        aboutMission: aboutMissionState,
-        aboutValues: aboutValuesState,
-        aboutTimeline: aboutTimelineState,
-        aboutTeam: aboutTeamState,
-        aboutAwards: aboutAwardsState,
-        saveAbout,
-        resetAbout,
+        searchHero: searchHeroState, searchPopular: searchPopularState, searchQuickLinks: searchQuickLinksState, searchCTA: searchCTAState, searchResultsConfig: searchResultsConfigState,
+        searchLoading, reloadSearch, saveSearch,
 
-        contactHero: contactHeroState,
-        contactMethods: contactMethodsState,
-        contactFormConfig: contactFormConfigState,
-        contactMapConfig: contactMapConfigState,
-        contactWorkingHours: contactWorkingHoursState,
-        contactSocialLinks: contactSocialLinksState,
-        contactCtaBanner: contactCtaBannerState,
-        contactFaqTeaser: contactFaqTeaserState,
-        saveContact,
-        resetContact,
-
-        offersHero: offersHeroState,
-        offersSeasonal: offersSeasonalState,
-        offersFlash: offersFlashState,
-        offersRedeem: offersRedeemState,
-        offersNotify: offersNotifyState,
-        saveOffers,
-        resetOffers,
-
-        clinicInfo: clinicInfoState,
-        clinicHours: clinicHoursState,
-        clinicSocial: clinicSocialState,
-        clinicEmergency: clinicEmergencyState,
-        saveSettings,
-        resetSettings,
-
-        testimonials: testimonialsState,
-        testimonialsConfig: testimonialsConfigState,
-        testimonialsStats: initialTestimonialsStats,
-        saveTestimonials,
-        resetTestimonials,
-
-        searchHero: searchHeroState,
-        searchPopular: searchPopularState,
-        searchQuickLinks: searchQuickLinksState,
-        searchCTA: searchCTAState,
-        searchResultsConfig: searchResultsConfigState,
-        saveSearch,
-        resetSearch,
-
-        homeContent: homeContentState,
-        saveHomeContent,
-        resetHomeContent,
+        homeContent: homeContentState, saveHomeContent, resetHomeContent,
       }}
     >
       {children}

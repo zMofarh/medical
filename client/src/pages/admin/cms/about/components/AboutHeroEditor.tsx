@@ -1,7 +1,7 @@
-import { aboutHero } from "@/mocks/aboutData";
 import { useState } from "react";
+import { AboutHeroData } from "@/types/cms";
 
-type HeroData = typeof aboutHero;
+type HeroData = AboutHeroData;
 
 interface Props {
   data: HeroData;

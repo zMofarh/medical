@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/feature/Navbar";
 import Footer from "@/components/feature/Footer";
-import { type MedicalPackage } from "@/mocks/packagesData";
 import { usePublicPackages } from "@/hooks/useCMSPackages";
+import { useDataContext, type MedicalPackage } from "@/context/DataContext";
+
 
 const accentMap: Record<string, {
   bg: string; text: string; border: string; badge: string;
@@ -189,6 +190,8 @@ function TabBar({
 }
 
 export default function PackageDetailPage() {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabId>("overview");

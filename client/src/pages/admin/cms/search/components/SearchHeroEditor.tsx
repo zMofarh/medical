@@ -1,15 +1,11 @@
-import { useState } from "react";
-import { searchHeroData, type SearchHeroData } from "@/mocks/searchPageData";
+import { SearchHeroData } from "@/types/cms";
 
-export default function SearchHeroEditor() {
-  const [data, setData] = useState<SearchHeroData>(searchHeroData);
-  const [saved, setSaved] = useState(false);
+interface SearchHeroEditorProps {
+  data: SearchHeroData;
+  onChange: (d: SearchHeroData) => void;
+}
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
+export default function SearchHeroEditor({ data, onChange }: SearchHeroEditorProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-5">
@@ -22,15 +18,6 @@ export default function SearchHeroEditor() {
             <p className="text-xs text-gray-400">العنوان الرئيسي وحقل البحث</p>
           </div>
         </div>
-        <button
-          onClick={handleSave}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-            saved ? "bg-green-500 text-white" : "bg-[#2E4E45] text-white hover:bg-[#243d36]"
-          }`}
-        >
-          <i className={saved ? "ri-check-line" : "ri-save-line"}></i>
-          {saved ? "تم الحفظ!" : "حفظ"}
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,8 +25,8 @@ export default function SearchHeroEditor() {
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">نص الشارة</label>
           <input
             type="text"
-            value={data.badge}
-            onChange={(e) => setData({ ...data, badge: e.target.value })}
+            value={data.badge || ""}
+            onChange={(e) => onChange({ ...data, badge: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -48,7 +35,7 @@ export default function SearchHeroEditor() {
           <input
             type="text"
             value={data.title}
-            onChange={(e) => setData({ ...data, title: e.target.value })}
+            onChange={(e) => onChange({ ...data, title: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -56,8 +43,8 @@ export default function SearchHeroEditor() {
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">النص التوضيحي (تحت العنوان)</label>
           <input
             type="text"
-            value={data.subtitle}
-            onChange={(e) => setData({ ...data, subtitle: e.target.value })}
+            value={data.subtitle || ""}
+            onChange={(e) => onChange({ ...data, subtitle: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>
@@ -66,7 +53,7 @@ export default function SearchHeroEditor() {
           <input
             type="text"
             value={data.placeholder}
-            onChange={(e) => setData({ ...data, placeholder: e.target.value })}
+            onChange={(e) => onChange({ ...data, placeholder: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2E4E45]"
           />
         </div>

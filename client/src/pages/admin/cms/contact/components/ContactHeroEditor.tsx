@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { contactHero } from "@/mocks/contactData";
+import { ContactHeroData } from "@/types/cms";
 
-type HeroData = typeof contactHero;
+type HeroData = ContactHeroData;
 interface Props { data: HeroData; onChange: (d: HeroData) => void; }
 
 export default function ContactHeroEditor({ data, onChange }: Props) {

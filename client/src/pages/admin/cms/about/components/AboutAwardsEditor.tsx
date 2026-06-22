@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { aboutAwards } from "@/mocks/aboutData";
+import { AboutAward } from "@/types/cms";
 
-type AwardsData = typeof aboutAwards;
+type AwardsData = AboutAward[];
 type Award = AwardsData[number];
 
 interface Props {

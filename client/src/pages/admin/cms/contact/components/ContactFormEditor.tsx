@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { contactFormConfig } from "@/mocks/contactData";
+import { ContactFormConfig } from "@/types/cms";
 
-type FormData = typeof contactFormConfig;
+type FormData = ContactFormConfig;
 interface Props { data: FormData; onChange: (d: FormData) => void; }
 
 export default function ContactFormEditor({ data, onChange }: Props) {

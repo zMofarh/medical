@@ -1,6 +1,7 @@
 import { CMSContent } from "@/mocks/cmsData";
 
-export const API_BASE_URL = 'http://localhost:8000/api/cms/home';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/cms/home`;
 
 export interface CMSHomeResponse {
   hero: any;
@@ -35,7 +36,7 @@ export function adaptToBackend(data: CMSContent) {
 }
 
 export async function getHomeContent(): Promise<CMSContent> {
-  const res = await fetch(`${API_BASE_URL}/`);
+  const res = await fetch(`${LOCAL_API_URL}/`);
   if (!res.ok) throw new Error("Failed to fetch home CMS content");
   const data = await res.json();
   return adaptToFrontend(data);
@@ -44,7 +45,7 @@ export async function getHomeContent(): Promise<CMSContent> {
 export async function updateHomeContent(data: CMSContent): Promise<CMSContent> {
   const token = localStorage.getItem("access_token");
   const backendData = adaptToBackend(data);
-  const res = await fetch(`${API_BASE_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}/`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -66,3 +67,4 @@ export async function updateHomeContent(data: CMSContent): Promise<CMSContent> {
   const updated = await res.json();
   return adaptToFrontend(updated);
 }
+

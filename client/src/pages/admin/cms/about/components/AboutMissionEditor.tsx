@@ -1,6 +1,6 @@
-import { aboutMission } from "@/mocks/aboutData";
+import { AboutMission } from "@/types/cms";
 
-type MissionData = typeof aboutMission;
+type MissionData = AboutMission[];
 type MissionItem = MissionData[number];
 
 interface Props {

@@ -1,5 +1,6 @@
-export const API_BASE_URL = 'http://localhost:8000/api/faqs';
-export const CATEGORY_API_BASE_URL = 'http://localhost:8000/api/faq-categories';
+import { API_BASE_URL } from './config';
+const LOCAL_API_URL = `${API_BASE_URL}/faqs`;
+export const CATEGORY_API_BASE_URL = `${API_BASE_URL}/faq-categories`;
 
 import { FAQItem, FAQCategory } from "@/mocks/faqData";
 
@@ -57,7 +58,7 @@ export async function deleteFaqCategory(id: string): Promise<{ message: string }
 // ─── FAQs ─────────────────────────────────────────────────────────────────────
 
 export async function getFaqs(category?: string): Promise<FAQItem[]> {
-  const url = category ? `${API_BASE_URL}?category=${category}` : API_BASE_URL;
+  const url = category ? `${LOCAL_API_URL}?category=${category}` : `${LOCAL_API_URL}/`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch FAQs");
   return res.json();
@@ -65,7 +66,7 @@ export async function getFaqs(category?: string): Promise<FAQItem[]> {
 
 export async function createFaq(data: FAQItem): Promise<FAQItem> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -80,7 +81,7 @@ export async function createFaq(data: FAQItem): Promise<FAQItem> {
 
 export async function updateFaq(id: string, data: FAQItem): Promise<FAQItem> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -95,7 +96,7 @@ export async function updateFaq(id: string, data: FAQItem): Promise<FAQItem> {
 
 export async function deleteFaq(id: string): Promise<{ message: string }> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${API_BASE_URL}/${id}`, {
+  const res = await fetch(`${LOCAL_API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`
@@ -162,3 +163,4 @@ export async function massSaveFaqs(newFaqs: FAQItem[], oldFaqs: FAQItem[], newCa
     }
   }
 }
+

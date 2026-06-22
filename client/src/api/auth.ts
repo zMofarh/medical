@@ -5,7 +5,9 @@
  * It uses the native fetch API.
  */
 
-const API_BASE_URL = 'http://localhost:8000/api/auth';
+import { API_BASE_URL } from './config';
+
+const AUTH_API_URL = `${API_BASE_URL}/auth`;
 
 export interface LoginCredentials {
   username: string; // The backend uses OAuth2PasswordRequestForm which expects 'username' (we map email to it)
@@ -36,7 +38,7 @@ export async function login(credentials: LoginCredentials): Promise<TokenRespons
   formData.append('username', credentials.username);
   formData.append('password', credentials.password);
 
-  const response = await fetch(`${API_BASE_URL}/login`, {
+  const response = await fetch(`${AUTH_API_URL}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -57,7 +59,7 @@ export async function login(credentials: LoginCredentials): Promise<TokenRespons
  * @param token The bearer access token
  */
 export async function getCurrentUser(token: string): Promise<UserResponse> {
-  const response = await fetch(`${API_BASE_URL}/me`, {
+  const response = await fetch(`${AUTH_API_URL}/me`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

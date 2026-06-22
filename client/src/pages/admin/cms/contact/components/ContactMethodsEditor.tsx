@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { contactMethods } from "@/mocks/contactData";
+import { ContactMethod } from "@/types/cms";
 
-type MethodsData = typeof contactMethods;
+type MethodsData = ContactMethod[];
 type Method = MethodsData[number];
 
 interface Props { data: MethodsData; onChange: (d: MethodsData) => void; }

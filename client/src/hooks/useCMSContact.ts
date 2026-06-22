@@ -1,24 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  contactHero,
-  contactMethods,
-  contactFormConfig,
-  contactMapConfig,
-  contactWorkingHours,
-  contactSocialLinks,
-  contactCtaBanner,
-  contactFaqTeaser,
-} from "@/mocks/contactData";
 import { useDataContext } from "@/context/DataContext";
-
-type ContactHero         = typeof contactHero;
-type ContactMethods      = typeof contactMethods;
-type ContactFormConfig   = typeof contactFormConfig;
-type ContactMapConfig    = typeof contactMapConfig;
-type ContactWorkingHours = typeof contactWorkingHours;
-type ContactSocialLinks  = typeof contactSocialLinks;
-type ContactCtaBanner    = typeof contactCtaBanner;
-type ContactFaqTeaser    = typeof contactFaqTeaser;
+import { ContactCtaBanner, ContactFaqTeaser, ContactFormConfig, ContactHeroData, ContactMapConfig, ContactMethod, ContactSocialLink, ContactWorkingHours } from "@/types/cms";
 
 // ─── Public hook (read-only, reactive) ───────────────────────────────────────
 export function usePublicContact() {
@@ -48,15 +30,14 @@ export function useCMSContact() {
     contactCtaBanner: globalCta,
     contactFaqTeaser: globalFaq,
     saveContact,
-    resetContact,
   } = useDataContext();
 
-  const [hero, setHero]       = useState<ContactHero>(globalHero);
-  const [methods, setMethods] = useState<ContactMethods>(globalMethods);
+  const [hero, setHero]       = useState<ContactHeroData>(globalHero);
+  const [methods, setMethods] = useState<ContactMethod[]>(globalMethods);
   const [form, setForm]       = useState<ContactFormConfig>(globalForm);
   const [map, setMap]         = useState<ContactMapConfig>(globalMap);
   const [hours, setHours]     = useState<ContactWorkingHours>(globalHours);
-  const [social, setSocial]   = useState<ContactSocialLinks>(globalSocial);
+  const [social, setSocial]   = useState<ContactSocialLink[]>(globalSocial);
   const [cta, setCta]         = useState<ContactCtaBanner>(globalCta);
   const [faq, setFaq]         = useState<ContactFaqTeaser>(globalFaq);
   
@@ -75,8 +56,8 @@ export function useCMSContact() {
   }, [globalHero, globalMethods, globalForm, globalMap, globalHours, globalSocial, globalCta, globalFaq]);
 
   const save = useCallback(async (data: {
-    hero: ContactHero; methods: ContactMethods; form: ContactFormConfig;
-    map: ContactMapConfig; hours: ContactWorkingHours; social: ContactSocialLinks;
+    hero: ContactHeroData; methods: ContactMethod[]; form: ContactFormConfig;
+    map: ContactMapConfig; hours: ContactWorkingHours; social: ContactSocialLink[];
     cta: ContactCtaBanner; faq: ContactFaqTeaser;
   }) => {
     setSaveStatus("saving");
@@ -94,19 +75,26 @@ export function useCMSContact() {
 
   const mark = () => setHasChanges(true);
 
-  const updateHero    = useCallback((d: ContactHero)         => { setHero(d);    mark(); }, []);
-  const updateMethods = useCallback((d: ContactMethods)      => { setMethods(d); mark(); }, []);
+  const updateHero    = useCallback((d: ContactHeroData)         => { setHero(d);    mark(); }, []);
+  const updateMethods = useCallback((d: ContactMethod[])      => { setMethods(d); mark(); }, []);
   const updateForm    = useCallback((d: ContactFormConfig)   => { setForm(d);    mark(); }, []);
   const updateMap     = useCallback((d: ContactMapConfig)    => { setMap(d);     mark(); }, []);
   const updateHours   = useCallback((d: ContactWorkingHours) => { setHours(d);   mark(); }, []);
-  const updateSocial  = useCallback((d: ContactSocialLinks)  => { setSocial(d);  mark(); }, []);
+  const updateSocial  = useCallback((d: ContactSocialLink[])  => { setSocial(d);  mark(); }, []);
   const updateCta     = useCallback((d: ContactCtaBanner)    => { setCta(d);     mark(); }, []);
   const updateFaq     = useCallback((d: ContactFaqTeaser)    => { setFaq(d);     mark(); }, []);
 
   const reset = useCallback(() => {
-    resetContact();
+    setHero(globalHero);
+    setMethods(globalMethods);
+    setForm(globalForm);
+    setMap(globalMap);
+    setHours(globalHours);
+    setSocial(globalSocial);
+    setCta(globalCta);
+    setFaq(globalFaq);
     setHasChanges(false);
-  }, [resetContact]);
+  }, [globalHero, globalMethods, globalForm, globalMap, globalHours, globalSocial, globalCta, globalFaq]);
 
   return {
     hero, methods, form, map, hours, social, cta, faq,
@@ -115,3 +103,5 @@ export function useCMSContact() {
     save, reset,
   };
 }
+
+

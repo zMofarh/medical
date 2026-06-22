@@ -1,8 +1,8 @@
-import { contactSocialLinks, contactCtaBanner, contactFaqTeaser } from "@/mocks/contactData";
+import { ContactCtaBanner, ContactFaqTeaser, ContactSocialLink } from "@/types/cms";
 
-type SocialData  = typeof contactSocialLinks;
-type CtaData     = typeof contactCtaBanner;
-type FaqData     = typeof contactFaqTeaser;
+type SocialData  = ContactSocialLink[];
+type CtaData     = ContactCtaBanner;
+type FaqData     = ContactFaqTeaser;
 type SocialLink  = SocialData[number];
 
 interface Props {

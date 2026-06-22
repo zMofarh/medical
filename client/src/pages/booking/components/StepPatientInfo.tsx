@@ -1,7 +1,6 @@
+import { useDataContext } from "@/context/DataContext";
 import { useRef, useState } from "react";
 import { usePublicDoctors } from "@/hooks/useCMSDoctors";
-import { servicesData } from "@/mocks/servicesData";
-import { allPackages } from "@/mocks/packagesData";
 import { createBooking } from "@/api/bookings";
 
 type SubmitStatus = "idle" | "loading" | "error";
@@ -44,6 +43,8 @@ export default function StepPatientInfo({
   onBack,
   onSuccess,
 }: StepPatientInfoProps) {
+  const { services: servicesData, packages: allPackages, posts: blogPosts } = useDataContext();
+
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [charCount, setCharCount] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
