@@ -26,9 +26,9 @@ services:
       - PROJECT_NAME=The Medical Avenue API
       - SHOW_DOCS=False
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-    # Accessed internally by the client Nginx container
-    expose:
-      - "8000"
+    # Exposed on port 8000
+    ports:
+      - "8000:8000"
     depends_on:
       - db
     # Wait for the DB, run alembic migrations, then launch uvicorn
@@ -41,7 +41,7 @@ services:
     container_name: medical_client
     restart: always
     ports:
-      - "80:80"
+      - "3000:3000"
     depends_on:
       - backend
 
