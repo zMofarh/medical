@@ -14,7 +14,7 @@ export async function getFaqCategories(): Promise<FAQCategory[]> {
 
 export async function createFaqCategory(data: FAQCategory): Promise<FAQCategory> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${CATEGORY_API_BASE_URL}/`, {
+  const res = await fetch(`${CATEGORY_API_BASE_URL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export async function deleteFaqCategory(id: string): Promise<{ message: string }
 // ─── FAQs ─────────────────────────────────────────────────────────────────────
 
 export async function getFaqs(category?: string): Promise<FAQItem[]> {
-  const url = category ? `${LOCAL_API_URL}?category=${category}` : `${LOCAL_API_URL}/`;
+  const url = category ? `${LOCAL_API_URL}?category=${category}` : `${LOCAL_API_URL}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch FAQs");
   return res.json();
@@ -66,7 +66,7 @@ export async function getFaqs(category?: string): Promise<FAQItem[]> {
 
 export async function createFaq(data: FAQItem): Promise<FAQItem> {
   const token = localStorage.getItem("access_token");
-  const res = await fetch(`${LOCAL_API_URL}/`, {
+  const res = await fetch(`${LOCAL_API_URL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
