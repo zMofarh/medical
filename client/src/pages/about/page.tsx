@@ -314,14 +314,20 @@ export default function About() {
               <div>
                 <span className="inline-block bg-brand-forest-100 text-brand-forest-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">{story.badge}</span>
                 <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6 leading-tight">
-                  {story.title.split("إلى")[0]}
-                  <span className="text-brand-forest-600">إلى {story.title.split("إلى")[1]}</span>
+                  {story.title && story.title.includes("إلى") ? (
+                    <>
+                      {story.title.split("إلى")[0]}
+                      <span className="text-brand-forest-600">إلى {story.title.split("إلى")[1]}</span>
+                    </>
+                  ) : (
+                    story.title
+                  )}
                 </h2>
-                {story.paragraphs.map((p, i) => (
+                {(story.paragraphs || []).map((p, i) => (
                   <p key={i} className="text-gray-500 text-base leading-relaxed mb-4">{p}</p>
                 ))}
                 <div className="flex flex-wrap gap-3 mt-4">
-                  {story.tags.map((tag, i) => {
+                  {(story.tags || []).map((tag, i) => {
                     const shapes = [StarShape, LotusShape, SunShape];
                     const Shape = shapes[i % shapes.length];
                     return (

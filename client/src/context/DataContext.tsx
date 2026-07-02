@@ -522,8 +522,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAboutLoading(true);
     try {
       const data = await getAboutCMS();
-      setAboutHero(data.hero || defaultAboutHero);
-      setAboutStory(data.story || defaultAboutStory);
+      setAboutHero({ ...defaultAboutHero, ...data.hero });
+      setAboutStory({ ...defaultAboutStory, ...data.story });
       setAboutMission(data.mission || []);
       setAboutValues(data.values || []);
       setAboutTimeline(data.timeline || []);
@@ -540,12 +540,34 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setContactLoading(true);
     try {
       const data = await getContactCMS();
-      setContactHero(data.hero || defaultContactHero);
+      setContactHero({ ...defaultContactHero, ...data.hero });
       setContactMethods(data.methods || []);
-      setContactFormConfig(data.form_config || defaultContactForm);
-      setContactMapConfig(data.map_config || defaultContactMap);
-      setContactCtaBanner(data.cta_banner || defaultContactCta);
-      setContactFaqTeaser(data.faq_teaser || defaultContactFaq);
+      
+      const formConfig = (data.form_config || {}) as any;
+      setContactFormConfig({
+        ...defaultContactForm,
+        ...formConfig,
+        fields: {
+          name: { ...defaultContactForm.fields.name, ...formConfig.fields?.name },
+          phone: { ...defaultContactForm.fields.phone, ...formConfig.fields?.phone },
+          email: { ...defaultContactForm.fields.email, ...formConfig.fields?.email },
+          subject: { ...defaultContactForm.fields.subject, ...formConfig.fields?.subject },
+          message: { ...defaultContactForm.fields.message, ...formConfig.fields?.message },
+        }
+      });
+
+      const mapConfig = (data.map_config || {}) as any;
+      setContactMapConfig({
+        ...defaultContactMap,
+        ...mapConfig,
+        coordinates: {
+          ...defaultContactMap.coordinates,
+          ...mapConfig.coordinates
+        }
+      });
+
+      setContactCtaBanner({ ...defaultContactCta, ...data.cta_banner });
+      setContactFaqTeaser({ ...defaultContactFaq, ...data.faq_teaser });
     } catch (err) {
       console.error("Failed to fetch Contact CMS", err);
     } finally {
@@ -557,11 +579,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSearchLoading(true);
     try {
       const data = await getSearchCMS();
-      setSearchHero(data.hero || defaultSearchHero);
+      setSearchHero({ ...defaultSearchHero, ...data.hero });
       setSearchPopular(data.popular_searches || []);
       setSearchQuickLinks(data.quick_links || []);
-      setSearchCTA(data.cta || defaultSearchCTA);
-      setSearchResultsConfig(data.results_config || defaultSearchResultsConfig);
+      setSearchCTA({ ...defaultSearchCTA, ...data.cta });
+      setSearchResultsConfig({ ...defaultSearchResultsConfig, ...data.results_config });
     } catch (err) {
       console.error("Failed to fetch Search CMS", err);
     } finally {
@@ -573,9 +595,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOffersLoading(true);
     try {
       const data = await getOffersPageConfig();
-      setOffersHero(data.hero || defaultOffersHero);
+      setOffersHero({ ...defaultOffersHero, ...data.hero });
       setOffersRedeem(data.how_to_redeem || []);
-      setOffersNotify(data.notify || defaultOffersNotify);
+      
+      const notifyConfig = (data.notify || {}) as any;
+      setOffersNotify({
+        ...defaultOffersNotify,
+        ...notifyConfig,
+        ctaPrimary: {
+          text: notifyConfig.ctaPrimary?.text ?? defaultOffersNotify.ctaPrimary?.text ?? "",
+          link: notifyConfig.ctaPrimary?.link ?? defaultOffersNotify.ctaPrimary?.link ?? "",
+        },
+        ctaSecondary: {
+          text: notifyConfig.ctaSecondary?.text ?? defaultOffersNotify.ctaSecondary?.text ?? "",
+          link: notifyConfig.ctaSecondary?.link ?? defaultOffersNotify.ctaSecondary?.link ?? "",
+        }
+      });
     } catch (err) {
       console.error("Failed to fetch Offers CMS", err);
     } finally {
@@ -587,10 +622,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSettingsLoading(true);
     try {
       const data = await getSettings();
-      setClinicInfo(data.clinic_info || defaultClinicInfo);
-      setClinicHours(data.working_hours || defaultWorkingHours);
-      setClinicSocial(data.social_media || defaultSocialMedia);
-      setClinicEmergency(data.emergency_contact || defaultEmergencyContact);
+      setClinicInfo({ ...defaultClinicInfo, ...data.clinic_info });
+      setClinicHours({ ...defaultWorkingHours, ...data.working_hours });
+      setClinicSocial({ ...defaultSocialMedia, ...data.social_media });
+      setClinicEmergency({ ...defaultEmergencyContact, ...data.emergency_contact });
     } catch (err) {
       console.error("Failed to fetch Settings CMS", err);
     } finally {
